@@ -1,0 +1,198 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "Example Type",
+    "description": "Example types for tests",
+    "version": "0.0.1",
+    "definitions": {
+      "ExampleType": {
+        "type": "object",
+        "properties": {
+          "stringProp": {
+            "type": "string",
+            "default": "abc"
+          },
+          "stringArr": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "default": "pqr"
+            }
+          },
+          "enumProp": {
+            "type": "object",
+            "enum": {"AAA": 0, "BBB": null, "CCC": 2},
+            "default": "CCC"
+          },
+          "enumArr": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "enum": {"E_AAA": 0, "E_BBB": 1, "E_CCC": 2}
+            },
+            "minItems": 11,
+            "maxItems": 31
+          },
+          "intProp": {
+            "type":"integer",
+            "minimum": 5,
+            "maximum": 45,
+            "default": 10
+          },
+          "intArr": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "minimum": 5,
+              "maximum": 45
+            },
+            "minItems": 12,
+            "maxItems": 32
+          },
+          "int32Prop": {
+            "type":"integer",
+            "format": "int32",
+            "minimum": 5,
+            "maximum": 45,
+            "default": 10
+          },
+          "int32Arr": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int32",
+              "minimum": 5,
+              "maximum": 45
+            },
+            "minItems": 13,
+            "maxItems": 33
+          },
+          "hexProp": {
+            "type":"string",
+            "format":"hex",
+            "width": 10,
+            "default": "0x3ff"
+          },
+          "hexArr": {
+            "type":"array",
+            "items": {
+              "type": "string",
+              "format": "hex",
+              "width": 11
+            },
+            "minItems": 14,
+            "maxItems": 34
+          },
+          "longProp": {
+            "type":"integer",
+            "format": "int64",
+            "minimum": 5,
+            "maximum": 45
+          },
+          "longArr": {
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "int64",
+              "minimum": 5,
+              "maximum": 45
+            },
+            "minItems": 14,
+            "maxItems": 34
+          },
+          "numberProp": {
+            "type":"number"
+          },
+          "numberArr": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            }
+          },
+          "floatProp": {
+            "type":"number",
+            "format": "float"
+          },
+          "floatArr": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "float"
+            }
+          },
+          "doubleProp": {
+            "type":"number",
+            "format": "double"
+          },
+          "doubleArr": {
+            "type": "array",
+            "items": {
+              "type": "number",
+              "format": "double"
+            }
+          },
+          "boolProp": {
+            "type": "boolean",
+            "default": false
+          },
+          "boolArr": {
+            "type": "array",
+            "items": {
+              "type": "boolean"
+            },
+            "minItems": 15,
+            "maxItems": 35
+          },
+          "complexRefProp": {
+            "description": "first referenc of OtherComplexType",
+            "$ref": "#/definitions/OtherComplexType"
+          },
+          "complexDuplicate": {
+            "description": "second referenc of OtherComplexType",
+            "$ref": "#/definitions/OtherComplexType"
+          },
+          "complexArrayRef": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/OtherComplexTypeForArray"
+            },
+            "minItems": 4,
+            "maxItems": 9
+          }
+        }
+      },
+      "OtherComplexType": {
+        "type": "object",
+        "properties": {
+          "someString": {
+            "type": "string",
+            "default": "xyz"
+          },
+          "recursiveComplexReference": {
+            "$ref": "#/definitions/InnerOtherComplex"
+          }
+        }
+      },
+      "InnerOtherComplex": {
+        "type": "object",
+        "properties": {
+          "someBoolean": {
+            "type": "boolean"
+          }
+        }
+      },
+      "OtherComplexTypeForArray": {
+        "type": "object",
+        "properties": {
+          "someInteger": {
+            "type": "integer",
+            "minimum": 5,
+            "maximum": 45,
+            "default": 6
+          },
+          "recursiveComplexReference": {
+            "$ref": "#/definitions/InnerOtherComplex"
+          }
+        }
+      }
+    }
+  }

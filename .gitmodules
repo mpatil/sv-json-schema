@@ -1,0 +1,6 @@
+[submodule "JSONinSV"]
+	path = JSONinSV
+	url = https://github.com/mpatil/JSONinSV.git
+[submodule "statham-schema"]
+	path = statham-schema
+	url = https://github.com/mpatil/statham-schema

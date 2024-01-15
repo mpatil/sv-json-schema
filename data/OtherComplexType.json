@@ -1,0 +1,386 @@
+[
+    {
+        "someString": "Figure over mind threat wife central.",
+        "recursiveComplexReference": {
+            "someBoolean": false
+        },
+        "recursiveExampleTypeReference": {
+            "stringProp": "During kind benefit.",
+            "stringArr": [
+                "Court hit pretty station.",
+                "Listen identify fund person blood.",
+                "Begin once result maintain movie standard various which.",
+                "Another finally process newspaper manage garden.",
+                "Will strong beat not its."
+            ],
+            "enumProp": "BBB",
+            "enumArr": [
+                "E_AAA",
+                "E_AAA",
+                "E_BBB",
+                "E_BBB",
+                "E_CCC",
+                "E_AAA",
+                "E_AAA",
+                "E_BBB",
+                "E_CCC",
+                "E_BBB",
+                "E_BBB",
+                "E_CCC"
+            ],
+            "intProp": 3176,
+            "intArr": [
+                6926,
+                -2461,
+                -459,
+                677,
+                -1238,
+                -8679,
+                -9406,
+                -8008,
+                8101,
+                4083,
+                4513,
+                8350,
+                6855,
+                -283,
+                3977
+            ],
+            "int32Prop": -6260,
+            "int32Arr": [
+                5505,
+                2942,
+                -3292,
+                -6331,
+                6173,
+                4326,
+                9772,
+                -6724,
+                -9356,
+                -9243,
+                -740,
+                1883,
+                7141
+            ],
+            "hexProp": "0xaaaaaaaa",
+            "hexArr": [
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa"
+            ],
+            "longProp": -3938,
+            "longArr": [
+                6335,
+                7962,
+                -2013,
+                9556,
+                -8616,
+                7306,
+                -850,
+                -6609,
+                -493,
+                2900,
+                8839,
+                8575,
+                -4430,
+                -8893,
+                4490,
+                5547,
+                -2452,
+                -6595,
+                5936,
+                110,
+                -6491,
+                9708,
+                1903,
+                -4761,
+                -5572,
+                1022
+            ],
+            "numberProp": 4362.558260612752,
+            "numberArr": [
+                -5548.6624269809,
+                5957.727866559552,
+                -4083.7890387635525,
+                -8550.514264482748,
+                5644.233554852167,
+                -7474.834455212385,
+                -2043.9631727979647
+            ],
+            "floatProp": -8213.614698267038,
+            "floatArr": [
+                3619.4736479813023,
+                3320.3914424565082,
+                5250.5703615483335
+            ],
+            "doubleProp": 2265.142658041149,
+            "doubleArr": [
+                2730.4582627739896,
+                -3877.453663395753,
+                -7453.631769916501,
+                852.3185832565675
+            ],
+            "boolProp": false,
+            "boolArr": [
+                true,
+                true,
+                true,
+                false,
+                true,
+                false,
+                false,
+                true,
+                true,
+                false,
+                true,
+                false,
+                true,
+                false,
+                true,
+                true,
+                true,
+                true,
+                true,
+                true,
+                false,
+                true
+            ],
+            "complexArrayRef": [
+                {
+                    "someInteger": -8899,
+                    "recursiveComplexReference": {
+                        "someBoolean": true
+                    }
+                },
+                {
+                    "someInteger": 6517,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": 7699,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": -4220,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": 708,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": -2871,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": 1365,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": -4235,
+                    "recursiveComplexReference": {
+                        "someBoolean": true
+                    }
+                },
+                {
+                    "someInteger": 5038,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                }
+            ]
+        }
+    },
+    {
+        "someString": "Their discussion surface daughter president data data.",
+        "recursiveComplexReference": {
+            "someBoolean": false
+        },
+        "recursiveExampleTypeReference": {
+            "stringProp": "Time watch under partner.",
+            "stringArr": [
+                "Certain training country specific.",
+                "Low prepare us it the whether international already.",
+                "Popular according across which establish fact mouth.",
+                "Bag foreign likely discover.",
+                "Might scientist public.",
+                "Drug past finally ability international.",
+                "Measure let allow pay work require.",
+                "Establish local cost card.",
+                "Evidence executive range quickly.",
+                "Bank page ground provide throw social."
+            ],
+            "enumProp": "BBB",
+            "enumArr": [
+                "E_CCC",
+                "E_AAA",
+                "E_AAA",
+                "E_AAA",
+                "E_BBB",
+                "E_AAA",
+                "E_BBB",
+                "E_BBB",
+                "E_BBB",
+                "E_BBB",
+                "E_CCC"
+            ],
+            "intProp": 9911,
+            "intArr": [
+                -5378,
+                -1879,
+                -2910,
+                -815,
+                -9487,
+                878,
+                -3773,
+                -8904,
+                4106,
+                1865,
+                6020
+            ],
+            "int32Prop": -2911,
+            "int32Arr": [
+                497,
+                -8338,
+                -6699,
+                -5384,
+                -5432,
+                -955,
+                -571,
+                -3135,
+                -6537,
+                -3208,
+                6836,
+                -4790
+            ],
+            "hexProp": "0xaaaaaaaa",
+            "hexArr": [
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa",
+                "0xaaaaaaaa"
+            ],
+            "longProp": -2537,
+            "longArr": [
+                -4942,
+                -9245,
+                -8719,
+                -560,
+                3822,
+                -4376,
+                -893,
+                -1222,
+                -2643,
+                -2935,
+                -6538,
+                5283,
+                -1385,
+                -4499,
+                701
+            ],
+            "numberProp": -5027.054263447706,
+            "numberArr": [
+                -9932.110700171292,
+                3572.5084813260905
+            ],
+            "floatProp": 6405.196160965008,
+            "floatArr": [
+                8296.797966540416,
+                -9025.214972243757,
+                -4802.516691656534,
+                -9234.116156181564,
+                3642.089483053614,
+                4017.742264274517,
+                -8915.247398650026,
+                3363.9010440276834
+            ],
+            "doubleProp": -7018.31274022217,
+            "doubleArr": [
+                2885.9813187137943,
+                -819.9016569557215
+            ],
+            "boolProp": false,
+            "boolArr": [
+                true,
+                false,
+                true,
+                true,
+                true,
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false,
+                false
+            ],
+            "complexArrayRef": [
+                {
+                    "someInteger": 5869,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": -3751,
+                    "recursiveComplexReference": {
+                        "someBoolean": true
+                    }
+                },
+                {
+                    "someInteger": -5212,
+                    "recursiveComplexReference": {
+                        "someBoolean": true
+                    }
+                },
+                {
+                    "someInteger": 6163,
+                    "recursiveComplexReference": {
+                        "someBoolean": false
+                    }
+                },
+                {
+                    "someInteger": 7716,
+                    "recursiveComplexReference": {
+                        "someBoolean": true
+                    }
+                }
+            ]
+        }
+    }
+]

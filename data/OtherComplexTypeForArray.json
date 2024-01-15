@@ -1,0 +1,14 @@
+[
+    {
+        "someInteger": -7723,
+        "recursiveComplexReference": {
+            "someBoolean": false
+        }
+    },
+    {
+        "someInteger": 2318,
+        "recursiveComplexReference": {
+            "someBoolean": false
+        }
+    }
+]

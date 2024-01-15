@@ -1,0 +1,416 @@
+[
+    {
+        "stringProp": "East several face report foreign.",
+        "stringArr": [
+            "Blood respond eat way leader sound.",
+            "Thing room woman upon sit own.",
+            "You everything allow start environment go.",
+            "Executive there big tend music."
+        ],
+        "enumProp": "CCC",
+        "enumArr": [
+            "E_BBB",
+            "E_AAA",
+            "E_BBB",
+            "E_AAA",
+            "E_BBB",
+            "E_BBB",
+            "E_CCC",
+            "E_BBB",
+            "E_BBB",
+            "E_BBB",
+            "E_BBB",
+            "E_CCC",
+            "E_AAA",
+            "E_CCC",
+            "E_BBB",
+            "E_CCC",
+            "E_BBB",
+            "E_CCC",
+            "E_AAA"
+        ],
+        "intProp": 8460,
+        "intArr": [
+            6628,
+            -1059,
+            8966,
+            -2142,
+            -2167,
+            2927,
+            1723,
+            -3897,
+            -9404,
+            7764,
+            -2671,
+            -9295,
+            -5023,
+            -625,
+            -6091,
+            -2662,
+            -1065,
+            6277,
+            9492,
+            -7211,
+            -3073,
+            -8444,
+            7052,
+            -2389
+        ],
+        "int32Prop": 9326,
+        "int32Arr": [
+            -2405,
+            -2803,
+            3567,
+            -6397,
+            7605,
+            -7508,
+            2407,
+            5121,
+            7837,
+            7754,
+            -2125,
+            6969,
+            -219,
+            -657
+        ],
+        "hexProp": "0xaaaaaaaa",
+        "hexArr": [
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa"
+        ],
+        "longProp": 8805,
+        "longArr": [
+            5010,
+            -2223,
+            4543,
+            -2995,
+            -478,
+            8252,
+            -6678,
+            6332,
+            5790,
+            3809,
+            9645,
+            -3025,
+            5072,
+            6217,
+            -1368
+        ],
+        "numberProp": 2785.4375619851103,
+        "numberArr": [
+            1468.313709668735
+        ],
+        "floatProp": -9738.573008380383,
+        "floatArr": [
+            2214.977795243359
+        ],
+        "doubleProp": 5317.260406851133,
+        "doubleArr": [
+            7458.0882490828035,
+            5832.351891218322,
+            4986.180568689015,
+            -5294.693060126217,
+            -1753.7207790500345,
+            -346.32735109397277,
+            7557.402149084336,
+            -5443.2043563375055,
+            -9138.987016440991,
+            4081.8948173212057
+        ],
+        "boolProp": false,
+        "boolArr": [
+            false,
+            false,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            true,
+            true,
+            true,
+            false,
+            false,
+            false,
+            true
+        ],
+        "complexRefProp": {
+                "someString": "Box yet believe.",
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+        },
+        "complexDuplicate": {
+                "someString": "Number within operation education not remember enjoy.",
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+        },
+        "complexArrayRef": [
+            {
+                "someInteger": 6349,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": -7837,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": 2876,
+                "recursiveComplexReference": {
+                    "someBoolean": false
+                }
+            },
+            {
+                "someInteger": -6409,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": 90,
+                "recursiveComplexReference": {
+                    "someBoolean": false
+                }
+            },
+            {
+                "someInteger": 7067,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": -381,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            }
+        ]
+    },
+    {
+        "stringProp": "Type respond gun natural house.",
+        "stringArr": [
+            "After music through discover.",
+            "Owner economic measure minute catch let.",
+            "Rather size itself save view company.",
+            "Degree debate establish wind window hot major.",
+            "Significant act me within often become that.",
+            "Save large my yet most walk.",
+            "Style project draw various huge sign old."
+        ],
+        "enumProp": "AAA",
+        "enumArr": [
+            "E_BBB",
+            "E_AAA",
+            "E_AAA",
+            "E_AAA",
+            "E_BBB",
+            "E_BBB",
+            "E_BBB",
+            "E_CCC",
+            "E_BBB",
+            "E_BBB",
+            "E_AAA",
+            "E_AAA",
+            "E_AAA",
+            "E_AAA",
+            "E_CCC",
+            "E_BBB",
+            "E_BBB",
+            "E_AAA",
+            "E_CCC",
+            "E_AAA"
+        ],
+        "intProp": 5964,
+        "intArr": [
+            -4075,
+            5331,
+            -191,
+            -3512,
+            8992,
+            9786,
+            -7791,
+            -1827,
+            2498,
+            -2371,
+            -4157,
+            8156,
+            9878,
+            -7023,
+            5419,
+            751,
+            56,
+            -6888,
+            -5374,
+            -4792,
+            -856
+        ],
+        "int32Prop": -6094,
+        "int32Arr": [
+            -1610,
+            4979,
+            4772,
+            5042,
+            7327,
+            -7432,
+            -7277,
+            -3122,
+            -8876,
+            -3439,
+            -6323,
+            3112,
+            8862,
+            829,
+            678,
+            -7133,
+            6010,
+            5863,
+            1031,
+            -494,
+            -3262,
+            5556,
+            -4763,
+            3419,
+            9697,
+            -350,
+            -1574,
+            -1613
+        ],
+        "hexProp": "0xaaaaaaaa",
+        "hexArr": [
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa",
+            "0xaaaaaaaa"
+        ],
+        "longProp": 9886,
+        "longArr": [
+            -110,
+            778,
+            6177,
+            2372,
+            3497,
+            -977,
+            4349,
+            580,
+            4792,
+            8855,
+            7368,
+            570,
+            6277,
+            7598,
+            2684,
+            6999
+        ],
+        "numberProp": 7039.918549542882,
+        "numberArr": [
+            -5068.841309073508,
+            -4157.384708060293,
+            4506.487078444031
+        ],
+        "floatProp": -5006.2697840756255,
+        "floatArr": [
+            6514.752699521726,
+            -1945.6108770878266
+        ],
+        "doubleProp": 7407.967935866853,
+        "doubleArr": [
+            5904.108271670509,
+            1926.853142789602
+        ],
+        "boolProp": false,
+        "boolArr": [
+            false,
+            false,
+            true,
+            true,
+            true,
+            true,
+            true,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false,
+            true,
+            false,
+            false,
+            false,
+            false,
+            false,
+            true,
+            false,
+            true,
+            false,
+            false
+        ],
+        "complexRefProp": {
+            "someString": "Enter one foot health manager less.",
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+        },
+        "complexDuplicate": {
+            "someString": "Billion main focus alone sister poor.",
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+        },
+        "complexArrayRef": [
+            {
+                "someInteger": 5285,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": -3358,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": 2503,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            },
+            {
+                "someInteger": -9858,
+                "recursiveComplexReference": {
+                    "someBoolean": false
+                }
+            },
+            {
+                "someInteger": -2841,
+                "recursiveComplexReference": {
+                    "someBoolean": true
+                }
+            }
+        ]
+    }
+]
