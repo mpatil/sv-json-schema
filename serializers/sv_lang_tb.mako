@@ -10,12 +10,12 @@ program top();
       automatic JSONValue jv = new();
       automatic JSONStatus js = jv.loadFromFile("data/${ty}.json");
 
-      $display("JSONSTatus: %0d", js);
+      $display("JSONSTatus(${ty}): %0d", js);
 
       for (int i = 0; i < jv.getArraySize(); i++) begin
         automatic JSONValue jv_out = new();
         automatic config_m v = new();
-        $display("i: %0d", i);
+        $display("${ty}[i]: %0d", i);
         v.m_${ty} = new();
         void'(v.m_${ty}.randomize());
         if (js == 0)

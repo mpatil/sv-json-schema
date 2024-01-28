@@ -1,0 +1,21 @@
+[
+  {
+    "cfg": [
+      {
+        "addr_map": {
+          "addr": "0x01000000",
+          "domain": "MEM_DEVICE",
+          "id": 2,
+          "kind": "NORMAL",
+          "name": "addr_map",
+          "region": "0x40000000",
+          "size": 32768
+        },
+        "awuser_width": 4,
+        "en_ext_clock": true,
+        "is_active": false,
+        "txn_log_filelname": "txn.log"
+      }
+    ]
+  }
+]

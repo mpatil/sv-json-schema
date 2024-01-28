@@ -1,0 +1,107 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "title": "AXI4 BFM configuration ",
+    "description": "AXI4 Configuration",
+    "version": "0.0.1",
+    "definitions": {
+      "AddrMapKind":{
+        "type": "object",
+        "enum": {"NORMAL": 0, "STRIPE":null},
+        "default": "NORMAL"
+      },
+      "AddrMapDomain":{
+        "type": "object",
+        "enum": {"UNK": 0, "NS":1, "SI":2, "SO":3, "SS":-1}
+      },
+      "AddrMapMem":{
+        "type": "object",
+        "enum": {"MEM_NORMAL": 0, "MEM_DEVICE":1}
+      },
+      "AddrMap": {
+        "type": "object",
+        "properties": {
+          "kind": {
+             "$ref": "#/definitions/AddrMapKind"
+          },
+          "name": {
+            "type": "string",
+            "default": "addr_map"
+          },
+          "id": {
+            "type": "integer",
+            "default": 0
+          },
+          "domain": {
+             "$ref": "#/definitions/AddrMapDomain"
+          },
+          "region": {
+            "type":"string",
+            "format":"hex",
+            "width": 32,
+            "default": "0x0"
+          },
+          "addr": {
+            "type":"string",
+            "format":"hex",
+            "width": 32,
+            "default": "0x0"
+          },
+          "domain": {
+             "$ref": "#/definitions/AddrMapMem"
+          },
+          "size": {
+            "type":"integer"
+          }
+        }
+      },
+      "Cfg": {
+        "type": "object",
+        "properties": {
+          "is_active": {
+            "type": "boolean",
+            "default": false
+          },
+          "en_ext_clock": {
+            "type": "boolean",
+            "default": true
+          },
+          "txn_log_filelname": {
+            "type": "string",
+            "default": "txn%0d.log"
+          },
+          "addr_map": {
+              "$ref": "#/definitions/AddrMap"
+          },
+          "awuser_width": {
+            "type":"integer"
+          }
+        }
+      },
+      "MasterCfg": {
+        "type": "object",
+        "properties": {
+          "cfg": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Cfg"
+            },
+            "minItems": 1,
+            "maxItems": 4
+          }
+        }
+      },
+      "SlaveCfg": {
+        "type": "object",
+        "properties": {
+          "cfg": {
+            "type": "array",
+            "items": {
+              "$ref": "#/definitions/Cfg"
+            },
+            "minItems": 0,
+            "maxItems": 2
+          }
+        }
+      }
+    }
+  }

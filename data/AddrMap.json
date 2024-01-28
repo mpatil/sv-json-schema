@@ -1,0 +1,11 @@
+[
+  {
+    "addr": "0x9e736121",
+    "domain": "MEM_DEVICE",
+    "id": 841835973,
+    "kind": "STRIPE",
+    "name": "addr_map",
+    "region": "0x3ddd2fdf",
+    "size": -1582509160
+  }
+]

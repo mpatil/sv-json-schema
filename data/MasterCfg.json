@@ -1,0 +1,66 @@
+[
+  {
+    "cfg": [
+      {
+        "addr_map": {
+          "addr": "0x01000000",
+          "domain": "MEM_DEVICE",
+          "id": 0,
+          "kind": "STRIPE",
+          "name": "addr_map",
+          "region": "0x00000000",
+          "size": 32768
+        },
+        "awuser_width": 4,
+        "en_ext_clock": false,
+        "is_active": false,
+        "txn_log_filelname": "txn0.log"
+      },
+      {
+        "addr_map": {
+          "addr": "0x02000000",
+          "domain": "MEM_NORMAL",
+          "id": 1,
+          "kind": "STRIPE",
+          "name": "addr_map",
+          "region": "0x10000000",
+          "size": 32768
+        },
+        "awuser_width": 4,
+        "en_ext_clock": true,
+        "is_active": false,
+        "txn_log_filelname": "txn1.log"
+      },
+      {
+        "addr_map": {
+          "addr": "0x03000000",
+          "domain": "MEM_DEVICE",
+          "id": 3,
+          "kind": "STRIPE",
+          "name": "addr_map",
+          "region": "0x10000000",
+          "size": 32768
+        },
+        "awuser_width": 4,
+        "en_ext_clock": false,
+        "is_active": true,
+        "txn_log_filelname": "txn2.log"
+      },
+      {
+        "addr_map": {
+          "addr": "0x04000000",
+          "domain": "MEM_NORMAL",
+          "id": 4,
+          "kind": "STRIPE",
+          "name": "addr_map",
+          "region": "0x100000000",
+          "size": 32768
+        },
+        "awuser_width": 4,
+        "en_ext_clock": true,
+        "is_active": false,
+        "txn_log_filelname": "txn3.log"
+      }
+    ]
+  }
+]

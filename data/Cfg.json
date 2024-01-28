@@ -1,0 +1,17 @@
+[
+  {
+    "addr_map": {
+      "addr": "0000100000",
+      "domain": "MEM_NORMAL",
+      "id": 0,
+      "kind": "NORMAL",
+      "name": "addr_map",
+      "region": "0x00000000",
+      "size": 4096
+    },
+    "awuser_width": 4,
+    "en_ext_clock": false,
+    "is_active": false,
+    "txn_log_filelname": "txn_slv.log"
+  }
+]

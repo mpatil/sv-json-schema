@@ -1,5 +1,4 @@
--64 +define+UVM
- -uvm -uvmhome uvm-1.2
++define+UVM
  JSONinSV/json_pkg/json_pkg.sv
 +incdir+JSONinSV/json_pkg
 +incdir+serializers
