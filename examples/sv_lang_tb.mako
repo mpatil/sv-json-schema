@@ -8,7 +8,7 @@ program top();
 % for ty in params['classes']:
   initial begin
       automatic JSONValue jv = new();
-      automatic JSONStatus js = jv.loadFromFile("data/${ty}.json");
+      automatic JSONStatus js = jv.loadFromFile("examples/data/${ty}.json");
 
       $display("JSONSTatus(${ty}): %0d", js);
 
