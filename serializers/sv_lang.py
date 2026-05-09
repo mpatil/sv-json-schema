@@ -6,7 +6,8 @@ of bit-vector metadata (see ``serializers.bitvec``); statham's universal model
 stays untouched.
 """
 
-from typing import Any, Dict, List, Optional, Tuple, TypeVar
+import re
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, TypeVar
 
 from statham.schema.constants import NotPassed
 from statham.schema.elements import (
@@ -27,6 +28,38 @@ from serializers.oneof import OneOfMap, OneOfPropMap
 T = TypeVar("T")
 
 
+_SV_IDENT_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
+
+
+class PlainEnumError(ValueError):
+    """Raised when a plain string enum can't be projected onto SV identifiers."""
+
+
+class PlainEnum(NamedTuple):
+    kind: str  # "str" or "int"
+    values: Tuple[Any, ...]
+    typedef: Optional[str]  # set for "str" kind only
+
+
+def _plain_enum_for(owner: str, prop: str, elem: Element) -> Optional[PlainEnum]:
+    inner = _array_items(elem)
+    if isinstance(inner.enum, NotPassed):
+        return None
+    if isinstance(inner, String):
+        values = tuple(inner.enum)
+        for v in values:
+            if not _SV_IDENT_RE.fullmatch(v):
+                raise PlainEnumError(
+                    f"{owner}.{prop}: enum value {v!r} is not a valid SV identifier; "
+                    "string-enum values must round-trip via uvm_enum_wrapper "
+                    "(letters, digits, underscores; not starting with a digit)."
+                )
+        return PlainEnum("str", values, f"{owner}_{prop}_e")
+    if isinstance(inner, Integer):
+        return PlainEnum("int", tuple(inner.enum), None)
+    return None
+
+
 def _maybe(value: Any, default: T) -> T:
     """Collapse statham's ``Maybe[T]`` to ``T``, substituting `default` for ``NotPassed``."""
     return default if isinstance(value, NotPassed) else value
@@ -36,13 +69,17 @@ def _array_items(elem: Element) -> Element:
     return elem.items if isinstance(elem, Array) else elem
 
 
-def sv_type(elem: Element, bitvec: Optional[BitVec]) -> Tuple[str, bool]:
+def sv_type(
+    elem: Element, bitvec: Optional[BitVec], plain_enum: Optional[PlainEnum] = None
+) -> Tuple[str, bool]:
     """Map an element to (SV type, isRand)."""
     if elem is None:
         return "???", False
     inner = _array_items(elem)
     if bitvec is not None:
         return "logic", True
+    if plain_enum is not None and plain_enum.kind == "str":
+        return plain_enum.typedef, True
     if isinstance(inner, Integer):
         return "int", True
     if isinstance(inner, Number):
@@ -60,7 +97,9 @@ def sv_width(bitvec: Optional[BitVec]) -> Optional[int]:
     return None if bitvec is None else bitvec.width
 
 
-def json_type(elem: Element, bitvec: Optional[BitVec]) -> Optional[str]:
+def json_type(
+    elem: Element, bitvec: Optional[BitVec], plain_enum: Optional[PlainEnum] = None
+) -> Optional[str]:
     """Categorise a property for the Mako template's macro dispatch."""
     if elem is None:
         return None
@@ -68,6 +107,10 @@ def json_type(elem: Element, bitvec: Optional[BitVec]) -> Optional[str]:
     inner = _array_items(elem)
     if bitvec is not None:
         cat = bitvec.radix  # "hex" | "binary"
+    elif plain_enum is not None and plain_enum.kind == "str":
+        cat = "enum"  # reuse the existing typedef-enum macro path
+    elif plain_enum is not None and plain_enum.kind == "int":
+        cat = "enum_int"
     elif isinstance(inner, Integer) or isinstance(inner, Number):
         cat = "int"
     elif isinstance(inner, Boolean):
@@ -81,10 +124,12 @@ def json_type(elem: Element, bitvec: Optional[BitVec]) -> Optional[str]:
     return f"{cat}_array" if is_array else cat
 
 
-def sv_def(elem: Element, bitvec: Optional[BitVec]) -> Optional[str]:
+def sv_def(
+    elem: Element, bitvec: Optional[BitVec], plain_enum: Optional[PlainEnum] = None
+) -> Optional[str]:
     """Render the SV literal for a default value (or None if absent)."""
     if elem is None or isinstance(elem, Array):
-        return None if elem is None else sv_def(elem.items, bitvec)
+        return None if elem is None else sv_def(elem.items, bitvec, plain_enum)
     if isinstance(elem.default, NotPassed):
         return None
     raw = elem.default
@@ -93,6 +138,9 @@ def sv_def(elem: Element, bitvec: Optional[BitVec]) -> Optional[str]:
             return f"'h{str(raw)[2:]}"
         if bitvec.radix == RADIX_BINARY:
             return f"'b{str(raw)[2:]}"
+    if plain_enum is not None and plain_enum.kind == "str":
+        # Default emitted as the bare enum identifier (matches the typedef).
+        return f"{raw}"
     if isinstance(elem, (Integer, Number)):
         return f"{raw}"
     if isinstance(elem, Boolean):
@@ -176,6 +224,7 @@ def _serialize_classes(
     widths: WidthMap,
     oneofs: OneOfMap,
     oneof_props: OneOfPropMap,
+    string_enums: Dict[str, List[str]],
 ) -> Dict[str, Dict[str, Any]]:
     branch_to_base = _branch_to_base(oneofs)
     cs: Dict[str, Dict[str, Any]] = {}
@@ -187,7 +236,8 @@ def _serialize_classes(
         for p in o.properties:
             elem = o._properties[p].element
             bv = widths.get((owner, p))
-            ty, is_rand = sv_type(elem, bv)
+            pe = _plain_enum_for(owner, p, elem)
+            ty, is_rand = sv_type(elem, bv, pe)
             base = oneof_props.get((owner, p))
             if base is not None:
                 # Override inferred type/category with the oneOf base class.
@@ -195,17 +245,22 @@ def _serialize_classes(
                 is_rand = False  # oneOf-typed fields aren't safe to randomize
                 cat = "oneof_array" if isinstance(elem, Array) else "oneof"
             else:
-                cat = json_type(elem, bv)
+                cat = json_type(elem, bv, pe)
+            if pe is not None and pe.kind == "str":
+                string_enums[pe.typedef] = list(pe.values)
             prop: Dict[str, Any] = {
                 "name": p,
                 "type_cat": cat,
                 "type": ty,
                 "isRand": is_rand,
-                "def": sv_def(elem, bv),
+                "def": sv_def(elem, bv, pe),
                 "width": sv_width(bv),
                 "isArray": isinstance(elem, Array),
                 "isRequired": bool(o._properties[p].required),
                 "oneOfBase": base,
+                "enumIntValues": (
+                    list(pe.values) if pe is not None and pe.kind == "int" else None
+                ),
             }
             prop.update(
                 _array_constraints(p, elem)
@@ -243,8 +298,12 @@ def serialize_sv(
     widths = widths or {}
     oneofs = oneofs or {}
     oneof_props = oneof_props or {}
+    string_enums: Dict[str, List[str]] = {}
+    classes = _serialize_classes(elements, widths, oneofs, oneof_props, string_enums)
+    enums = _serialize_enums(elements)
+    enums.update(string_enums)
     return {
-        "enums": _serialize_enums(elements),
-        "classes": _serialize_classes(elements, widths, oneofs, oneof_props),
+        "enums": enums,
+        "classes": classes,
         "oneOfs": _serialize_oneofs(oneofs),
     }

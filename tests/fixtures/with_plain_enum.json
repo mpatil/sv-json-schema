@@ -1,0 +1,17 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WithPlainEnum",
+  "description": "Exercises plain JSON-Schema enum on String and Integer (scalar + array).",
+  "definitions": {
+    "Cfg": {
+      "type": "object",
+      "properties": {
+        "color": { "type": "string",  "enum": ["red", "green", "blue"], "default": "red" },
+        "level": { "type": "integer", "enum": [0, 1, 5] },
+        "tags":  { "type": "array",   "items": { "type": "string",  "enum": ["a", "b"] }, "minItems": 1, "maxItems": 3 },
+        "vals":  { "type": "array",   "items": { "type": "integer", "enum": [1, 2, 3] },  "minItems": 1, "maxItems": 3 }
+      },
+      "required": ["color", "level"]
+    }
+  }
+}

@@ -7,7 +7,7 @@ branch.
 | # | Feature                                                     | Effort | Status |
 |---|-------------------------------------------------------------|--------|--------|
 | 1 | `required` field enforcement (uvm_error on missing key)     | M      | done   |
-| 2 | Plain `enum` on string / integer                            | M      | open   |
+| 2 | Plain `enum` on string / integer                            | M      | done   |
 | 3 | `oneOf` composition (discriminator-based, top-level only)   | L      | done   |
 | 4 | `additionalProperties: false` (uvm_error on unknown keys)   | S      | done   |
 | 5 | `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`        | XS     | done   |

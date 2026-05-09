@@ -20,6 +20,7 @@ GENERATION_CASES = [
     ("all_types", "tests/fixtures/all_types.json"),
     ("with_oneof", "tests/fixtures/with_oneof.json"),
     ("with_strict", "tests/fixtures/with_strict.json"),
+    ("with_plain_enum", "tests/fixtures/with_plain_enum.json"),
 ]
 
 

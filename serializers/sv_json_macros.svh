@@ -19,8 +19,7 @@
 `define from_json_enum_array(VAR, TYPE) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) begin \
           string s_ = _arr_``VAR``.getByIndex(i).asString(); \
           void'(TYPE``_wrapper::from_name(s_, m_``VAR``[i])); \
@@ -36,8 +35,7 @@
 `define from_json_string_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           m_``VAR``[i] = _arr_``VAR``.getByIndex(i).asString(); \
       end
@@ -49,8 +47,7 @@
 `define from_json_hex_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           void'($sscanf(_arr_``VAR``.getByIndex(i).asString(), "0x%h", m_``VAR``[i])); \
       end
@@ -62,8 +59,7 @@
 `define from_json_binary_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           void'($sscanf(_arr_``VAR``.getByIndex(i).asString(), "0b%b", m_``VAR``[i])); \
       end
@@ -75,8 +71,7 @@
 `define from_json_bool_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           m_``VAR``[i] = _arr_``VAR``.getByIndex(i).isTrue(); \
       end
@@ -88,8 +83,7 @@
 `define from_json_int_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           m_``VAR``[i] = _arr_``VAR``.getByIndex(i).asInt(); \
       end
@@ -104,8 +98,7 @@
 `define from_json_object_array(VAR) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) begin \
           m_``VAR``[i] = new("", this); \
           m_``VAR``[i].fromJSON(_arr_``VAR``.getByIndex(i)); \
@@ -122,8 +115,7 @@
 `define from_json_object_array_sub(VAR, TYPE) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) begin \
           TYPE _t_``VAR = new("", this, m__root); \
           _t_``VAR.fromJSON(_arr_``VAR``.getByIndex(i)); \
@@ -145,8 +137,7 @@
 `define from_json_oneof_array(VAR, BASE) \
       if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
         Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
-        if (_arr_``VAR``.size() > m_``VAR``.size) \
-          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
         for (int i = 0; i < _arr_``VAR``.size(); i++) \
           m_``VAR``[i] = BASE``::fromJSONFactory(_arr_``VAR``.getByIndex(i)); \
       end

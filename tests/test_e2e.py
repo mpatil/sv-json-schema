@@ -225,6 +225,51 @@ def test_strict_extra_key_emits_uvm_error(
     )
 
 
+def test_plain_enum_roundtrip(simulator, repo_root, fixtures_dir, tmp_path):
+    """Plain string + integer enums (scalar and array) must round-trip."""
+    if simulator != "vcs":
+        pytest.skip("plain-enum e2e currently requires vcs")
+    workspace = _build_workspace(
+        repo_root,
+        fixtures_dir,
+        "with_plain_enum.json",
+        tmp_path,
+        fixtures_dir / "data_plain_enum",
+    )
+    _vcs_compile_and_run(workspace)
+    out = json.loads((workspace / "Cfg0.json").read_text(encoding="utf8"))
+    expected = json.loads(
+        (fixtures_dir / "data_plain_enum" / "Cfg.json").read_text(encoding="utf8")
+    )[0]
+    assert out["color"] == expected["color"]
+    assert out["level"] == expected["level"]
+    assert out["tags"] == expected["tags"]
+    assert out["vals"] == expected["vals"]
+
+
+def test_plain_enum_int_out_of_set_emits_uvm_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """An integer-enum value not in the allowed set must fire uvm_error."""
+    if simulator != "vcs":
+        pytest.skip("plain-enum e2e currently requires vcs")
+    rogue = tmp_path / "rogue_data"
+    rogue.mkdir()
+    (rogue / "Cfg.json").write_text(
+        json.dumps(
+            [{"color": "red", "level": 99, "tags": ["a"], "vals": [1]}], indent=2
+        )
+    )
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_plain_enum.json", tmp_path / "ws", rogue
+    )
+    sim = _vcs_compile_and_run(workspace)
+    combined = sim.stdout + sim.stderr
+    assert "'level' value 99 not in enum" in combined, (
+        f"expected enum_int uvm_error not in sim output:\n{combined}"
+    )
+
+
 def test_oneof_unknown_discriminator_emits_uvm_error(
     simulator, repo_root, fixtures_dir, tmp_path
 ):

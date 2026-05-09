@@ -88,8 +88,26 @@ class config_m extends uvm_object;
                 f'if (jv.getByKey("{n}") == null) '
                 f'`uvm_error(get_full_name(), "required field \\"{n}\\" missing from input")'
             )
-        fjson_s.append(f"`from_json_{mem['type_cat']}({n}{e})")
-        tjson_s.append(f"`to_json_{mem['type_cat']}({n})")
+        if mem['type_cat'] == 'enum_int':
+            fjson_s.append(f"`from_json_int({n})")
+            tjson_s.append(f"`to_json_int({n})")
+            vals = ', '.join(str(v) for v in mem['enumIntValues'])
+            fjson_s.append(
+                f'if (! (m_{n} inside {{ {vals} }})) '
+                f'`uvm_error(get_full_name(), $sformatf("\'{n}\' value %0d not in enum", m_{n}))'
+            )
+        elif mem['type_cat'] == 'enum_int_array':
+            fjson_s.append(f"`from_json_int_array({n})")
+            tjson_s.append(f"`to_json_int_array({n})")
+            vals = ', '.join(str(v) for v in mem['enumIntValues'])
+            fjson_s.append(
+                f"foreach (m_{n}[_i]) "
+                f"if (! (m_{n}[_i] inside {{ {vals} }})) "
+                f'`uvm_error(get_full_name(), $sformatf("\'{n}\' element %0d not in enum", m_{n}[_i]))'
+            )
+        else:
+            fjson_s.append(f"`from_json_{mem['type_cat']}({n}{e})")
+            tjson_s.append(f"`to_json_{mem['type_cat']}({n})")
 
         if mem['isArray']:
             if mem['type_cat'] == "string_array":
@@ -102,7 +120,7 @@ class config_m extends uvm_object;
             foreach (m_{n}[i]) begin
                 printer.print_string("{n}", m_{n}[i].name);
             end""")
-            elif mem['type_cat'] == "int_array":
+            elif mem['type_cat'] in ("int_array", "enum_int_array"):
                 if mem['type'] == "real":
                     uvm_prnt = f"""printer.print_real("{n}", m_{n}[i]);"""
                 else:
@@ -156,6 +174,11 @@ class config_m extends uvm_object;
                 )
             if mem.get('uniqueItems'):
                 con_s.append(f"constraint {n}_unique_c {{ unique {{ m_{n} }}; }};")
+            if mem['type_cat'] == 'enum_int_array':
+                vals = ', '.join(str(v) for v in mem['enumIntValues'])
+                con_s.append(
+                    f"constraint {n}_enum_c {{ foreach (m_{n}[_i]) m_{n}[_i] inside {{ {vals} }}; }};"
+                )
         else:
             if mem['type_cat'] == "string":
                 prnt_s.append(f"""\
@@ -163,7 +186,7 @@ class config_m extends uvm_object;
             elif mem['type_cat'] == "enum":
                 prnt_s.append(f"""\
             printer.print_string("{n}", m_{n}.name);""")
-            elif mem['type_cat'] == "int":
+            elif mem['type_cat'] in ("int", "enum_int"):
                 if mem['type'] == "real":
                     uvm_prnt = f"""printer.print_real("{n}", m_{n});"""
                 else:
@@ -197,6 +220,11 @@ class config_m extends uvm_object;
             if mem['rangeConstraints']:
                 con_s.append(
                     f"constraint {n}_range_c {{ {'; '.join(mem['rangeConstraints'])}; }};"
+                )
+            if mem['type_cat'] == 'enum_int':
+                vals = ', '.join(str(v) for v in mem['enumIntValues'])
+                con_s.append(
+                    f"constraint {n}_enum_c {{ m_{n} inside {{ {vals} }}; }};"
                 )
 
     if cls.get('strict'):

@@ -48,6 +48,15 @@ def with_strict_params(fixtures_dir):
     return serialize_sv(parse(raw))
 
 
+@pytest.fixture(scope="module")
+def with_plain_enum_params(fixtures_dir):
+    raw = materialize(
+        RefDict.from_uri(f"{fixtures_dir / 'with_plain_enum.json'}#/"),
+        context_labeller=title_labeller(),
+    )
+    return serialize_sv(parse(raw))
+
+
 def _props_by_name(class_dict):
     """Index a class entry's member list by property name."""
     return {p["name"]: p for p in class_dict["members"]}
@@ -185,3 +194,63 @@ class TestStrictSection:
 
     def test_loose_class_not_marked(self, with_strict_params):
         assert with_strict_params["classes"]["Loose"]["strict"] is False
+
+
+class TestPlainEnum:
+    def test_string_enum_typedef_emitted(self, with_plain_enum_params):
+        # Synthesised typedef gets registered alongside object-with-enum typedefs.
+        assert with_plain_enum_params["enums"]["Cfg_color_e"] == ["red", "green", "blue"]
+        assert with_plain_enum_params["enums"]["Cfg_tags_e"] == ["a", "b"]
+
+    def test_string_enum_property_dispatches_via_existing_enum_path(
+        self, with_plain_enum_params
+    ):
+        props = _props_by_name(with_plain_enum_params["classes"]["Cfg"])
+        assert props["color"]["type_cat"] == "enum"
+        assert props["color"]["type"] == "Cfg_color_e"
+        assert props["tags"]["type_cat"] == "enum_array"
+        assert props["tags"]["type"] == "Cfg_tags_e"
+
+    def test_int_enum_keeps_int_storage_with_inside_set(self, with_plain_enum_params):
+        props = _props_by_name(with_plain_enum_params["classes"]["Cfg"])
+        assert props["level"]["type_cat"] == "enum_int"
+        assert props["level"]["type"] == "int"
+        assert props["level"]["enumIntValues"] == [0, 1, 5]
+        assert props["vals"]["type_cat"] == "enum_int_array"
+        assert props["vals"]["type"] == "int"
+        assert props["vals"]["enumIntValues"] == [1, 2, 3]
+
+    def test_string_enum_default_emitted_as_bareword(self, with_plain_enum_params):
+        props = _props_by_name(with_plain_enum_params["classes"]["Cfg"])
+        # Plain-string-enum default must NOT be quoted; it's an enum identifier.
+        assert props["color"]["def"] == "red"
+
+
+def test_invalid_string_enum_value_raises(fixtures_dir, tmp_path):
+    """An enum value that isn't a valid SV identifier should fail at codegen."""
+    import json as _json
+
+    from serializers.sv_lang import PlainEnumError
+
+    bad = tmp_path / "bad_enum.json"
+    bad.write_text(
+        _json.dumps(
+            {
+                "$schema": "http://json-schema.org/draft-07/schema#",
+                "title": "Bad",
+                "definitions": {
+                    "Cfg": {
+                        "type": "object",
+                        "properties": {
+                            "x": {"type": "string", "enum": ["foo-bar"]}
+                        },
+                    }
+                },
+            }
+        )
+    )
+    raw = materialize(
+        RefDict.from_uri(f"{bad}#/"), context_labeller=title_labeller()
+    )
+    with pytest.raises(PlainEnumError, match="foo-bar"):
+        serialize_sv(parse(raw))
