@@ -109,6 +109,9 @@ class config_m extends uvm_object;
             fjson_s.append(f"`from_json_{mem['type_cat']}({n}{e})")
             tjson_s.append(f"`to_json_{mem['type_cat']}({n})")
 
+        for check in mem.get('validationChecks', ()):
+            fjson_s.append(check)
+
         if mem['isArray']:
             if mem['type_cat'] == "string_array":
                 prnt_s.append(f"""\

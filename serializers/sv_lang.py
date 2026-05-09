@@ -130,9 +130,12 @@ def sv_def(
     """Render the SV literal for a default value (or None if absent)."""
     if elem is None or isinstance(elem, Array):
         return None if elem is None else sv_def(elem.items, bitvec, plain_enum)
-    if isinstance(elem.default, NotPassed):
-        return None
-    raw = elem.default
+    raw = _attr(elem, "default")
+    if raw is None:
+        # Promote `const` to default when no explicit default is given.
+        raw = _attr(elem, "const")
+        if raw is None:
+            return None
     if bitvec is not None:
         if bitvec.radix == RADIX_HEX:
             return f"'h{str(raw)[2:]}"
@@ -214,6 +217,63 @@ def _scalar_constraints(p: str, elem: Element) -> Dict[str, Any]:
     }
 
 
+def _sv_string_literal(s: Any) -> str:
+    """Encode a Python string into an SV double-quoted literal."""
+    return '"' + str(s).replace("\\", "\\\\").replace('"', '\\"') + '"'
+
+
+def _validation_checks(p: str, elem: Element) -> List[str]:
+    """Build SV uvm_error snippets for declarative scalar checks.
+
+    Covers `const`, `minLength`, `maxLength`. Bound to scalar properties only;
+    array variants would need a foreach wrapper that we don't generate yet.
+    """
+    if isinstance(elem, Array):
+        return []
+    checks: List[str] = []
+
+    const_val = _attr(elem, "const")
+    if const_val is not None:
+        if isinstance(elem, String):
+            literal = _sv_string_literal(const_val)
+            checks.append(
+                f"if (m_{p} != {literal}) "
+                f"`uvm_error(get_full_name(), $sformatf("
+                f"\"'{p}' must equal const %s, got '%s'\", {literal}, m_{p}))"
+            )
+        elif isinstance(elem, Boolean):
+            v = "1" if const_val else "0"
+            checks.append(
+                f"if (m_{p} != {v}) "
+                f"`uvm_error(get_full_name(), $sformatf("
+                f"\"'{p}' must equal const {v}, got %0d\", m_{p}))"
+            )
+        elif isinstance(elem, (Integer, Number)):
+            checks.append(
+                f"if (m_{p} != {const_val}) "
+                f"`uvm_error(get_full_name(), $sformatf("
+                f"\"'{p}' must equal const {const_val}, got %0d\", m_{p}))"
+            )
+
+    if isinstance(elem, String):
+        min_len = _attr(elem, "minLength")
+        if min_len is not None:
+            checks.append(
+                f"if (m_{p}.len() < {min_len}) "
+                f"`uvm_error(get_full_name(), $sformatf("
+                f"\"'{p}' length %0d below minLength {min_len}\", m_{p}.len()))"
+            )
+        max_len = _attr(elem, "maxLength")
+        if max_len is not None:
+            checks.append(
+                f"if (m_{p}.len() > {max_len}) "
+                f"`uvm_error(get_full_name(), $sformatf("
+                f"\"'{p}' length %0d above maxLength {max_len}\", m_{p}.len()))"
+            )
+
+    return checks
+
+
 def _branch_to_base(oneofs: OneOfMap) -> Dict[str, str]:
     """Reverse-index oneOf branches: branch_class_name -> base_class_name."""
     return {b.name: base for base, spec in oneofs.items() for b in spec.branches}
@@ -261,6 +321,7 @@ def _serialize_classes(
                 "enumIntValues": (
                     list(pe.values) if pe is not None and pe.kind == "int" else None
                 ),
+                "validationChecks": _validation_checks(p, elem),
             }
             prop.update(
                 _array_constraints(p, elem)

@@ -57,6 +57,15 @@ def with_plain_enum_params(fixtures_dir):
     return serialize_sv(parse(raw))
 
 
+@pytest.fixture(scope="module")
+def with_validation_params(fixtures_dir):
+    raw = materialize(
+        RefDict.from_uri(f"{fixtures_dir / 'with_validation.json'}#/"),
+        context_labeller=title_labeller(),
+    )
+    return serialize_sv(parse(raw))
+
+
 def _props_by_name(class_dict):
     """Index a class entry's member list by property name."""
     return {p["name"]: p for p in class_dict["members"]}
@@ -224,6 +233,27 @@ class TestPlainEnum:
         props = _props_by_name(with_plain_enum_params["classes"]["Cfg"])
         # Plain-string-enum default must NOT be quoted; it's an enum identifier.
         assert props["color"]["def"] == "red"
+
+
+class TestValidationChecks:
+    def test_minlength_maxlength_emit_uvm_error_snippets(self, with_validation_params):
+        props = _props_by_name(with_validation_params["classes"]["Cfg"])
+        checks = props["name"]["validationChecks"]
+        assert any("len() < 3" in c and "minLength 3" in c for c in checks)
+        assert any("len() > 8" in c and "maxLength 8" in c for c in checks)
+
+    def test_const_string_emits_check_and_default(self, with_validation_params):
+        props = _props_by_name(with_validation_params["classes"]["Cfg"])
+        prop = props["tag"]
+        assert any('m_tag != "v1"' in c for c in prop["validationChecks"])
+        # `const` promotes to the field's default literal.
+        assert prop["def"] == '"v1"'
+
+    def test_const_integer_emits_check_and_default(self, with_validation_params):
+        props = _props_by_name(with_validation_params["classes"]["Cfg"])
+        prop = props["version"]
+        assert any("m_version != 1" in c for c in prop["validationChecks"])
+        assert prop["def"] == "1"
 
 
 def test_invalid_string_enum_value_raises(fixtures_dir, tmp_path):

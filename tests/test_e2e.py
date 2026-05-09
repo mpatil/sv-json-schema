@@ -270,6 +270,75 @@ def test_plain_enum_int_out_of_set_emits_uvm_error(
     )
 
 
+def _run_validation_case(repo_root, fixtures_dir, tmp_path, cfg_payload):
+    """Run the with_validation fixture against `cfg_payload`; return combined sim output."""
+    rogue = tmp_path / "data"
+    rogue.mkdir()
+    (rogue / "Cfg.json").write_text(json.dumps(cfg_payload, indent=2))
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_validation.json", tmp_path / "ws", rogue
+    )
+    sim = _vcs_compile_and_run(workspace)
+    return sim.stdout + sim.stderr
+
+
+def test_validation_clean_input_passes(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    if simulator != "vcs":
+        pytest.skip("validation e2e currently requires vcs")
+    out = _run_validation_case(
+        repo_root, fixtures_dir, tmp_path,
+        [{"name": "okay", "tag": "v1", "version": 1}],
+    )
+    for unexpected in ("must equal const", "below minLength", "above maxLength"):
+        assert unexpected not in out, (
+            f"clean input should not produce a {unexpected!r} uvm_error:\n{out}"
+        )
+
+
+def test_validation_const_mismatch_string_emits_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    if simulator != "vcs":
+        pytest.skip("validation e2e currently requires vcs")
+    out = _run_validation_case(
+        repo_root, fixtures_dir, tmp_path,
+        [{"name": "okay", "tag": "wrong", "version": 1}],
+    )
+    assert "'tag' must equal const" in out, (
+        f"expected const-mismatch uvm_error not in sim output:\n{out}"
+    )
+
+
+def test_validation_minlength_violation_emits_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    if simulator != "vcs":
+        pytest.skip("validation e2e currently requires vcs")
+    out = _run_validation_case(
+        repo_root, fixtures_dir, tmp_path,
+        [{"name": "ok", "tag": "v1", "version": 1}],  # 2 chars, minLength=3
+    )
+    assert "below minLength 3" in out, (
+        f"expected minLength uvm_error not in sim output:\n{out}"
+    )
+
+
+def test_validation_maxlength_violation_emits_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    if simulator != "vcs":
+        pytest.skip("validation e2e currently requires vcs")
+    out = _run_validation_case(
+        repo_root, fixtures_dir, tmp_path,
+        [{"name": "wayyytooooLONG", "tag": "v1", "version": 1}],  # 14 > 8
+    )
+    assert "above maxLength 8" in out, (
+        f"expected maxLength uvm_error not in sim output:\n{out}"
+    )
+
+
 def test_oneof_unknown_discriminator_emits_uvm_error(
     simulator, repo_root, fixtures_dir, tmp_path
 ):

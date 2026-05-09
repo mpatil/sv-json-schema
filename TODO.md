@@ -17,10 +17,10 @@ branch.
 
 ## Smaller declarative gaps (would slot into existing serializer pipeline)
 
-* `minLength`, `maxLength` on string fields
+* ~~`minLength`, `maxLength` on string fields~~ (done)
 * `additionalItems`, `contains`, `minContains`, `maxContains` on arrays
 * `propertyNames`, `minProperties`, `maxProperties`, `dependencies`
-* `const`
+* ~~`const`~~ (done)
 * `if` / `then` / `else` (conditional)
 * `description` propagation into generated SV (docstrings or comments)
 
