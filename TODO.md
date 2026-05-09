@@ -13,7 +13,9 @@ This file is the to-do list for what's still open.
 * `default`
 * `required`
 * `const` (string / integer / boolean)
+* `description` (propagated to SV `//` comments)
 * Bit vectors: `format: "hex"`, `format: "binary"`, vendor `x-sv-width`
+* Integer `format: "int32"` / `"int64"` (→ SV `int` / `longint`)
 * Enums: object-with-enum (statham idiom), plain `enum` on string, plain
   `enum` on integer
 * Numeric: `minimum`, `maximum`, `exclusiveMinimum`, `exclusiveMaximum`,
@@ -24,21 +26,27 @@ This file is the to-do list for what's still open.
 * Object strictness: `additionalProperties: false`
 * `oneOf` composition with `discriminator` (top-level definitions only)
 * `$ref` (intra-document and external file)
+* Diagnostics for unsupported standard keywords (`--strict` to fail
+  codegen on any drop).
 
 ## Open
 
-Loosely ordered by payoff / effort.
+Loosely ordered by payoff / effort. Run with `--strict` to turn any
+silently-dropped open item into a hard error at codegen time.
 
 | Feature                                                                       | Effort | Notes |
 |-------------------------------------------------------------------------------|--------|-------|
-| `description` propagation → SV comments                                       | XS     | Pure polish. |
-| `minProperties` / `maxProperties` (object size guards)                        | S      | Same fromJSON-guard pattern as `additionalProperties: false`. |
+| `allOf` (composition / property merging)                                      | M      | Most common composition pattern after `oneOf`. |
 | Recursive `$ref` (forward declarations + cycle handling)                      | M      | Needed for tree-shaped configs. |
+| `minProperties` / `maxProperties` (object size guards)                        | S      | Same fromJSON-guard pattern as `additionalProperties: false`. |
 | `pattern` (regex on strings)                                                  | M      | SV has no clean regex story — runtime validation only. Low payoff. |
 | `null` type / multi-type unions (`["string", "null"]`)                        | L      | Today approximated by `required: false`. |
 | `additionalItems`, `contains`, `minContains`, `maxContains`                   | S      | Niche. |
 | `propertyNames`, `dependencies` / `dependentRequired` / `dependentSchemas`    | S each | Niche. |
+| `not` (negative composition)                                                  | M      | Lower payoff than `allOf`. |
+| `anyOf` (broader composition)                                                 | L      | We already have `oneOf` with discriminator. |
 | `if` / `then` / `else` (conditional schemas)                                  | L      | Big design choice for SV mapping. |
+| `unevaluatedItems` / `unevaluatedProperties`                                  | M      | 2019-09+ keyword. |
 
 ## Out of scope (for now)
 

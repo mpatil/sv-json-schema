@@ -5,8 +5,12 @@
   "definitions": {
     "Cfg": {
       "type": "object",
+      "description": "Configuration with validation constraints.",
       "properties": {
-        "name":    { "type": "string",  "minLength": 3, "maxLength": 8 },
+        "name":    {
+          "description": "Display name (3 to 8 chars).",
+          "type": "string", "minLength": 3, "maxLength": 8
+        },
         "tag":     { "type": "string",  "const": "v1" },
         "version": { "type": "integer", "const": 1 }
       }

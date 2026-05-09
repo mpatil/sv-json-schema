@@ -339,6 +339,7 @@ def _serialize_classes(
                 ),
                 "validationChecks": _validation_checks(p, elem),
                 "bits": integer_bits(int_fmt),
+                "description": _attr(elem, "description"),
             }
             prop.update(
                 _array_constraints(p, elem)
@@ -350,6 +351,7 @@ def _serialize_classes(
             "members": ms,
             "extends": branch_to_base.get(owner, "uvm_object"),
             "strict": getattr(o, "additionalProperties", True) is False,
+            "description": _attr(o, "description"),
         }
     return cs
 

@@ -5,9 +5,11 @@ class config_m extends uvm_object;
     typedef class Cfg;
 
 
+    // Configuration with validation constraints.
     class Cfg extends uvm_object;
         `uvm_object_utils(Cfg)
 
+        // Display name (3 to 8 chars).
         string m_name;
         string m_tag = "v1";
         rand int m_version = 1;

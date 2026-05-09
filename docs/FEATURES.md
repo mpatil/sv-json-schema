@@ -345,6 +345,61 @@ Fixture: `examples/axi4_cfg_schema.json` (Cfg.addr_map → AddrMap).
 
 ---
 
+## `description` → SV comments
+
+JSON Schema `description` (on a class or a property) is propagated as
+`// ...` comments above the corresponding SV declaration. Multi-line
+descriptions render as one `//` line each.
+
+```json
+{
+  "type": "object",
+  "description": "Configuration with validation constraints.",
+  "properties": {
+    "name": { "description": "Display name (3 to 8 chars).", "type": "string" }
+  }
+}
+```
+
+```sv
+    // Configuration with validation constraints.
+    class Cfg extends uvm_object;
+        ...
+        // Display name (3 to 8 chars).
+        string m_name;
+```
+
+Fixture: `tests/fixtures/with_validation.json` (the `Cfg` class and its
+`name` property each carry a description).
+
+---
+
+## Diagnostics: `--strict` and per-keyword warnings
+
+The generator walks the resolved schema dict before parsing and emits a
+diagnostic for every JSON-Schema assertion keyword it can't model
+(`allOf`, `anyOf`, `not`, `if/then/else`, `pattern`, `patternProperties`,
+`dependencies` / `dependentRequired` / `dependentSchemas`, `contains` /
+`min/maxContains` / `additionalItems`, `min/maxProperties`,
+`propertyNames`, `unevaluatedItems` / `unevaluatedProperties`,
+`additionalProperties: <schema>`, multi-type `type: [...]`, `type: null`,
+unsupported `format` strings on string / integer fields).
+
+```
+$ python3 app.py --input my.json --class-out a.sv --tb-out b.sv
+warning: definitions/Cfg/properties/name: keyword `pattern` is not
+         honored by the SV generator. The schema will validate via
+         JSON-Schema tools but the generated SV will not enforce the
+         corresponding constraint.
+```
+
+Pass `--strict` to turn each warning into an error and abort generation
+before any output is written. Tests for every checked-in fixture run a
+"zero diagnostics" assertion so a regression here surfaces as a unit
+failure, not a runtime surprise.
+
+---
+
 ## Generated UVM artifacts per class
 
 Every generated class:

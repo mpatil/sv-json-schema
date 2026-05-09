@@ -166,6 +166,8 @@ class config_m extends uvm_object;
             xi = "" if mem['minItems'] is None else f"m_{n}.size >= {mem['minItems']}; "
             ni = "" if mem['maxItems'] is None else f"m_{n}.size <= {mem['maxItems']}; "
 
+            if mem.get('description'):
+                mem_s.extend(f"// {ln}" for ln in mem['description'].splitlines())
             mem_s.append(f"{m}[];")
 
             if xi or ni:
@@ -215,6 +217,8 @@ class config_m extends uvm_object;
                 prnt_s.append(f"""\
             if (m_{n} != null) printer.print_object("{n}", m_{n});""")
 
+            if mem.get('description'):
+                mem_s.extend(f"// {ln}" for ln in mem['description'].splitlines())
             if mem['def']:
                 mem_s.append(f"{m} = {mem['def']};")
             else:
@@ -253,7 +257,11 @@ begin
     tjsons = '\n            '.join(tjson_s)
     fjsons = '\n            '.join(fjson_s)
     prnts  = '\n'.join(prnt_s)
+    cls_desc = (cls.get('description') or '').splitlines()
 %>\
+% for line in cls_desc:
+    // ${line}
+% endfor
     class ${ty} extends ${cls['extends']};
         `uvm_object_utils(${ty})
 
