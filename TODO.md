@@ -25,6 +25,7 @@ This file is the to-do list for what's still open.
   constraints
 * Object strictness: `additionalProperties: false`
 * `oneOf` composition with `discriminator` (top-level definitions only)
+* `allOf` composition (object property merging at definition level)
 * `$ref` (intra-document and external file)
 * Diagnostics for unsupported standard keywords (`--strict` to fail
   codegen on any drop).
@@ -36,7 +37,6 @@ silently-dropped open item into a hard error at codegen time.
 
 | Feature                                                                       | Effort | Notes |
 |-------------------------------------------------------------------------------|--------|-------|
-| `allOf` (composition / property merging)                                      | M      | Most common composition pattern after `oneOf`. |
 | Recursive `$ref` (forward declarations + cycle handling)                      | M      | Needed for tree-shaped configs. |
 | `minProperties` / `maxProperties` (object size guards)                        | S      | Same fromJSON-guard pattern as `additionalProperties: false`. |
 | `pattern` (regex on strings)                                                  | M      | SV has no clean regex story — runtime validation only. Low payoff. |

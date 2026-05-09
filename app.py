@@ -22,6 +22,7 @@ from serializers.bitvec import (  # noqa: E402
     collect_bitvec_widths,
     register_format_validators,
 )
+from serializers.composition import apply_allof_merging  # noqa: E402
 from serializers.diagnostics import collect_diagnostics  # noqa: E402
 from serializers.intformat import collect_int_formats  # noqa: E402
 from serializers.oneof import collect_oneof_props, collect_oneofs  # noqa: E402
@@ -112,6 +113,7 @@ def _resolve_schema(input_uri: str, *, strict: bool):
     raw = materialize(
         RefDict.from_uri(input_uri), context_labeller=title_labeller()
     )
+    apply_allof_merging(raw)
     diagnostics = collect_diagnostics(raw)
     for d in diagnostics:
         sys.stderr.write(f"{'error' if strict else 'warning'}: {d.format()}\n")

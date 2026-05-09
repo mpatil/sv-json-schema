@@ -172,6 +172,8 @@ def test_existing_fixtures_have_zero_diagnostics(repo_root, fixtures_dir):
     from json_ref_dict import RefDict, materialize
     from statham.titles import title_labeller
 
+    from serializers.composition import apply_allof_merging
+
     schemas = [
         repo_root / "examples" / "axi4_cfg_schema.json",
         repo_root / "examples" / "types.json",
@@ -180,11 +182,13 @@ def test_existing_fixtures_have_zero_diagnostics(repo_root, fixtures_dir):
         fixtures_dir / "with_strict.json",
         fixtures_dir / "with_plain_enum.json",
         fixtures_dir / "with_validation.json",
+        fixtures_dir / "with_allof.json",
     ]
     for schema in schemas:
         raw = materialize(
             RefDict.from_uri(f"{schema}#/"), context_labeller=title_labeller()
         )
+        apply_allof_merging(raw)
         diags = collect_diagnostics(raw)
         assert diags == [], (
             f"{schema.name} has diagnostics:\n"

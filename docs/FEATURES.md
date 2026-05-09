@@ -345,6 +345,45 @@ Fixture: `examples/axi4_cfg_schema.json` (Cfg.addr_map → AddrMap).
 
 ---
 
+## `allOf` (object property merging)
+
+When a top-level definition uses `allOf` to mix in properties from another
+object schema, the generator merges the branches' `properties` and
+`required` into the parent before parsing. The parent's own definitions
+take precedence on conflict; the `allOf` keyword is then stripped so it
+doesn't surface as a diagnostic.
+
+```json
+"definitions": {
+  "Identifiable": {
+    "type": "object",
+    "properties": {
+      "id":   { "type": "integer", "default": 0 },
+      "name": { "type": "string",  "default": "" }
+    },
+    "required": ["id"]
+  },
+  "Cfg": {
+    "type": "object",
+    "allOf": [{ "$ref": "#/definitions/Identifiable" }],
+    "properties": { "awuser": { "type": "integer" } },
+    "required": ["awuser"]
+  }
+}
+```
+
+The merged `Cfg` carries `id`, `name`, `awuser` and `required: [id, awuser]`.
+The mixin (`Identifiable`) is also still emitted as a stand-alone class for
+direct use.
+
+Branches that aren't object schemas (e.g., composing numeric constraints
+on a primitive type) are kept in place and surfaced via `--strict`. `anyOf`
+and `not` are not handled.
+
+Fixture: `tests/fixtures/with_allof.json`.
+
+---
+
 ## `description` → SV comments
 
 JSON Schema `description` (on a class or a property) is propagated as

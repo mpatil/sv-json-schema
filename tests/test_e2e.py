@@ -339,6 +339,31 @@ def test_validation_maxlength_violation_emits_error(
     )
 
 
+def test_allof_merged_properties_roundtrip(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """Properties merged via allOf must round-trip alongside native ones."""
+    if simulator != "vcs":
+        pytest.skip("allOf e2e currently requires vcs")
+    workspace = _build_workspace(
+        repo_root,
+        fixtures_dir,
+        "with_allof.json",
+        tmp_path,
+        fixtures_dir / "data_allof",
+    )
+    _vcs_compile_and_run(workspace)
+    out = json.loads((workspace / "Cfg0.json").read_text(encoding="utf8"))
+    inp = json.loads(
+        (fixtures_dir / "data_allof" / "Cfg.json").read_text(encoding="utf8")
+    )[0]
+    # `awuser` was native; `id`/`name` came in via allOf from Identifiable.
+    for key in ("id", "name", "awuser"):
+        assert out[key] == inp[key], (
+            f"Cfg.{key} did not round-trip: in={inp[key]!r} out={out.get(key)!r}"
+        )
+
+
 def test_int64_roundtrip(simulator, repo_root, fixtures_dir, tmp_path):
     """An integer with format=int64 must round-trip values beyond 2^31."""
     if simulator != "vcs":
