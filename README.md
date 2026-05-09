@@ -23,3 +23,11 @@ The json schema library used is statham-schema. The SystemVerilog serializer/des
 1. Setup simulator env. Mentor Questa (`qrun`) and Synopsys VCS are supported.
 1. Run the default generation with Questa: `make`
 1. Or run with VCS: `make vcsrun`
+
+## Tests
+
+* `make test` — full pytest run (unit + golden + end-to-end). The end-to-end
+  tests are skipped automatically when no simulator is on `PATH`.
+* `make test-fast` — unit and golden tests only; no simulator required.
+* `make update-golden` — refresh `tests/expected/*.config_m.sv` and
+  `*.testbench.sv` after an intentional generator change.

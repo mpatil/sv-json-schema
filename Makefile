@@ -18,3 +18,12 @@ vcsrun: config_m.sv testbench.sv
 	vcs -full64 -sverilog -ntb_opts uvm-1.2 -timescale=1ns/1ps -f sv_tb.f testbench.sv
 	./simv +UVM_VERBOSITY=UVM_MEDIUM +vcs+lic+wait
 
+test:
+	python3 -m pytest tests
+
+test-fast:
+	python3 -m pytest tests --ignore=tests/test_e2e.py
+
+update-golden:
+	python3 -m pytest tests/test_generation.py --update-golden
+

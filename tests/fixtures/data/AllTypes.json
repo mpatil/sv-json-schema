@@ -1,0 +1,20 @@
+[
+  {
+    "i": 7,
+    "i_arr": [1, 2, 3],
+    "b": true,
+    "b_arr": [false, true],
+    "s": "hello",
+    "s_arr": ["a", "b"],
+    "h": "0xbeef",
+    "h_arr": ["0x12", "0xab"],
+    "bn": "0b1010",
+    "bn_arr": ["0b01", "0b10"],
+    "e": "M_ON",
+    "obj": { "tag": "primary", "n": 42 },
+    "obj_arr": [
+      { "tag": "first",  "n": 1 },
+      { "tag": "second", "n": 2 }
+    ]
+  }
+]

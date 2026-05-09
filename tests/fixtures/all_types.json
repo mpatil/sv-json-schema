@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "AllTypes",
+  "description": "Synthetic schema covering every type_cat the SV generator can emit.",
+  "definitions": {
+    "Mode": {
+      "type": "object",
+      "enum": {"M_OFF": 0, "M_ON": 1}
+    },
+    "Inner": {
+      "type": "object",
+      "properties": {
+        "tag": { "type": "string", "default": "tag0" },
+        "n":   { "type": "integer", "default": 0 }
+      },
+      "required": ["tag"]
+    },
+    "AllTypes": {
+      "type": "object",
+      "properties": {
+        "i":      { "type": "integer", "default": 0 },
+        "i_arr":  { "type": "array", "items": { "type": "integer" }, "minItems": 1, "maxItems": 4 },
+        "b":      { "type": "boolean", "default": false },
+        "b_arr":  { "type": "array", "items": { "type": "boolean" }, "minItems": 1, "maxItems": 2 },
+        "s":      { "type": "string", "default": "default" },
+        "s_arr":  { "type": "array", "items": { "type": "string" }, "minItems": 1, "maxItems": 2 },
+        "h":      { "type": "string", "format": "hex",    "x-sv-width": 16, "default": "0x0" },
+        "h_arr":  { "type": "array", "items": { "type": "string", "format": "hex",    "x-sv-width": 8  }, "minItems": 1, "maxItems": 2 },
+        "bn":     { "type": "string", "format": "binary", "x-sv-width": 4,  "default": "0b0000" },
+        "bn_arr": { "type": "array", "items": { "type": "string", "format": "binary", "x-sv-width": 2  }, "minItems": 1, "maxItems": 2 },
+        "e":      { "$ref": "#/definitions/Mode" },
+        "obj":    { "$ref": "#/definitions/Inner" },
+        "obj_arr":{ "type": "array", "items": { "$ref": "#/definitions/Inner" }, "minItems": 1, "maxItems": 2 }
+      },
+      "required": ["i", "h", "obj"]
+    }
+  }
+}
