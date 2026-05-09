@@ -22,6 +22,7 @@ from serializers.bitvec import (  # noqa: E402
     collect_bitvec_widths,
     register_format_validators,
 )
+from serializers.intformat import collect_int_formats  # noqa: E402
 from serializers.oneof import collect_oneof_props, collect_oneofs  # noqa: E402
 from serializers.sv_lang import serialize_sv  # noqa: E402
 
@@ -102,7 +103,8 @@ def _resolve_schema(input_uri: str):
     widths = collect_bitvec_widths(raw)
     oneofs = collect_oneofs(raw)
     oneof_props = collect_oneof_props(raw)
-    return parse(raw), widths, oneofs, oneof_props
+    int_formats = collect_int_formats(raw)
+    return parse(raw), widths, oneofs, oneof_props, int_formats
 
 
 def _render(template_path: Path, params: dict) -> str:
@@ -130,8 +132,10 @@ def main(argv: Iterable[str] = None) -> int:
     register_format_validators()
     args = _parse_args(sys.argv[1:] if argv is None else argv)
 
-    elements, widths, oneofs, oneof_props = _resolve_schema(parse_input_arg(args.input))
-    params = serialize_sv(elements, widths, oneofs, oneof_props)
+    elements, widths, oneofs, oneof_props, int_formats = _resolve_schema(
+        parse_input_arg(args.input)
+    )
+    params = serialize_sv(elements, widths, oneofs, oneof_props, int_formats)
     params["data_dir"] = args.tb_data_dir.rstrip("/")
 
     if args.template is not None:

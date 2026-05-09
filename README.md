@@ -52,6 +52,7 @@ output examples and the test fixture that exercises it.
 | JSON Schema construct                                     | Status |
 |-----------------------------------------------------------|--------|
 | `string`, `integer`, `number`, `boolean`, `object`, `array` | done |
+| Integer `format: "int64"` → SV `longint` (and explicit `int32`) | done |
 | `default`                                                 | done |
 | `required` (uvm_error on missing key)                     | done |
 | `const` (string / integer / boolean)                      | done |

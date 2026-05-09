@@ -22,6 +22,7 @@ from statham.schema.elements.meta import ObjectMeta
 from statham.serializers.orderer import orderer
 
 from serializers.bitvec import BitVec, RADIX_BINARY, RADIX_HEX, WidthMap
+from serializers.intformat import IntFormatMap
 from serializers.oneof import OneOfMap, OneOfPropMap
 
 
@@ -69,8 +70,21 @@ def _array_items(elem: Element) -> Element:
     return elem.items if isinstance(elem, Array) else elem
 
 
+def _integer_sv_type(int_format: Optional[str]) -> str:
+    """Choose between SV `int` and `longint` based on the harvested `format`."""
+    return "longint" if int_format == "int64" else "int"
+
+
+def integer_bits(int_format: Optional[str]) -> int:
+    """Bit width for printer dispatch on integer-typed properties."""
+    return 64 if _integer_sv_type(int_format) == "longint" else 32
+
+
 def sv_type(
-    elem: Element, bitvec: Optional[BitVec], plain_enum: Optional[PlainEnum] = None
+    elem: Element,
+    bitvec: Optional[BitVec],
+    plain_enum: Optional[PlainEnum] = None,
+    int_format: Optional[str] = None,
 ) -> Tuple[str, bool]:
     """Map an element to (SV type, isRand)."""
     if elem is None:
@@ -81,7 +95,7 @@ def sv_type(
     if plain_enum is not None and plain_enum.kind == "str":
         return plain_enum.typedef, True
     if isinstance(inner, Integer):
-        return "int", True
+        return _integer_sv_type(int_format), True
     if isinstance(inner, Number):
         return "real", False
     if isinstance(inner, Boolean):
@@ -285,6 +299,7 @@ def _serialize_classes(
     oneofs: OneOfMap,
     oneof_props: OneOfPropMap,
     string_enums: Dict[str, List[str]],
+    int_formats: IntFormatMap,
 ) -> Dict[str, Dict[str, Any]]:
     branch_to_base = _branch_to_base(oneofs)
     cs: Dict[str, Dict[str, Any]] = {}
@@ -297,7 +312,8 @@ def _serialize_classes(
             elem = o._properties[p].element
             bv = widths.get((owner, p))
             pe = _plain_enum_for(owner, p, elem)
-            ty, is_rand = sv_type(elem, bv, pe)
+            int_fmt = int_formats.get((owner, p))
+            ty, is_rand = sv_type(elem, bv, pe, int_fmt)
             base = oneof_props.get((owner, p))
             if base is not None:
                 # Override inferred type/category with the oneOf base class.
@@ -322,6 +338,7 @@ def _serialize_classes(
                     list(pe.values) if pe is not None and pe.kind == "int" else None
                 ),
                 "validationChecks": _validation_checks(p, elem),
+                "bits": integer_bits(int_fmt),
             }
             prop.update(
                 _array_constraints(p, elem)
@@ -355,12 +372,16 @@ def serialize_sv(
     widths: Optional[WidthMap] = None,
     oneofs: Optional[OneOfMap] = None,
     oneof_props: Optional[OneOfPropMap] = None,
+    int_formats: Optional[IntFormatMap] = None,
 ) -> Dict[str, Any]:
     widths = widths or {}
     oneofs = oneofs or {}
     oneof_props = oneof_props or {}
+    int_formats = int_formats or {}
     string_enums: Dict[str, List[str]] = {}
-    classes = _serialize_classes(elements, widths, oneofs, oneof_props, string_enums)
+    classes = _serialize_classes(
+        elements, widths, oneofs, oneof_props, string_enums, int_formats
+    )
     enums = _serialize_enums(elements)
     enums.update(string_enums)
     return {

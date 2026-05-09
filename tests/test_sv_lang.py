@@ -13,6 +13,7 @@ from statham.schema.parser import parse
 from statham.titles import title_labeller
 
 from serializers.bitvec import collect_bitvec_widths
+from serializers.intformat import collect_int_formats
 from serializers.oneof import collect_oneof_props, collect_oneofs
 from serializers.sv_lang import serialize_sv
 
@@ -24,7 +25,8 @@ def all_types_params(fixtures_dir):
         context_labeller=title_labeller(),
     )
     widths = collect_bitvec_widths(raw)
-    return serialize_sv(parse(raw), widths)
+    int_formats = collect_int_formats(raw)
+    return serialize_sv(parse(raw), widths, int_formats=int_formats)
 
 
 @pytest.fixture(scope="module")
@@ -90,6 +92,8 @@ class TestClassesSection:
         "name,type_cat,sv_type,is_array",
         [
             ("i", "int", "int", False),
+            ("i64", "int", "longint", False),
+            ("i64_arr", "int_array", "longint", True),
             ("i_arr", "int_array", "int", True),
             ("b", "bool", "bit", False),
             ("b_arr", "bool_array", "bit", True),
@@ -160,6 +164,11 @@ class TestClassesSection:
         props = _props_by_name(all_types_params["classes"]["AllTypes"])
         # A scalar (non-array) field should never get uniqueItems=True.
         assert props["i"]["uniqueItems"] is False
+
+    @pytest.mark.parametrize("name,bits", [("i", 32), ("i64", 64), ("i64_arr", 64)])
+    def test_integer_format_sets_print_bits(self, all_types_params, name, bits):
+        props = _props_by_name(all_types_params["classes"]["AllTypes"])
+        assert props[name]["bits"] == bits
 
     def test_defaults_passed_through(self, all_types_params):
         props = _props_by_name(all_types_params["classes"]["AllTypes"])

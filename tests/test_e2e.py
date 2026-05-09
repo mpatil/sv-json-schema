@@ -339,6 +339,20 @@ def test_validation_maxlength_violation_emits_error(
     )
 
 
+def test_int64_roundtrip(simulator, repo_root, fixtures_dir, tmp_path):
+    """An integer with format=int64 must round-trip values beyond 2^31."""
+    if simulator != "vcs":
+        pytest.skip("int64 e2e currently requires vcs")
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "all_types.json", tmp_path, fixtures_dir / "data"
+    )
+    _vcs_compile_and_run(workspace)
+    out = json.loads((workspace / "AllTypes0.json").read_text(encoding="utf8"))
+    inp = json.loads((fixtures_dir / "data" / "AllTypes.json").read_text(encoding="utf8"))[0]
+    assert out["i64"] == inp["i64"] == 9999999999
+    assert out["i64_arr"] == inp["i64_arr"] == [12345678901, 9999999999]
+
+
 def test_oneof_unknown_discriminator_emits_uvm_error(
     simulator, repo_root, fixtures_dir, tmp_path
 ):

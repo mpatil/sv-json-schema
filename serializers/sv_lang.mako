@@ -127,7 +127,7 @@ class config_m extends uvm_object;
                 if mem['type'] == "real":
                     uvm_prnt = f"""printer.print_real("{n}", m_{n}[i]);"""
                 else:
-                    uvm_prnt = f"""printer.print_field_int("{n}", m_{n}[i], 32, UVM_DEC);"""
+                    uvm_prnt = f"""printer.print_field_int("{n}", m_{n}[i], {mem['bits']}, UVM_DEC);"""
                 prnt_s.append(f"""\
             foreach (m_{n}[i]) begin
                 {uvm_prnt}
@@ -193,7 +193,7 @@ class config_m extends uvm_object;
                 if mem['type'] == "real":
                     uvm_prnt = f"""printer.print_real("{n}", m_{n});"""
                 else:
-                    uvm_prnt = f"""printer.print_field_int("{n}", m_{n}, 32, UVM_DEC);"""
+                    uvm_prnt = f"""printer.print_field_int("{n}", m_{n}, {mem['bits']}, UVM_DEC);"""
                 prnt_s.append(f"""\
                 {uvm_prnt}""")
             elif mem['type_cat'] == "bool":

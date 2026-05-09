@@ -12,18 +12,39 @@ section maps to a checked-in schema + golden output + e2e test.
 
 ## Primitive types
 
-| JSON type   | SV mapping                       | Notes                  |
-|-------------|----------------------------------|------------------------|
-| `string`    | `string m_x;`                    | Not `rand` by default. |
-| `integer`   | `rand int m_x;`                  |                        |
-| `number`    | `real m_x;`                      |                        |
-| `boolean`   | `rand bit m_x;`                  | 0/1.                   |
-| `object`    | nested generated class           |                        |
-| `array`     | dynamic array `m_x[]` of inner   |                        |
+| JSON type   | SV mapping                       | Notes                          |
+|-------------|----------------------------------|--------------------------------|
+| `string`    | `string m_x;`                    | Not `rand` by default.         |
+| `integer`   | `rand int m_x;`                  | Use `format: "int64"` for 64-bit. |
+| `number`    | `real m_x;`                      |                                |
+| `boolean`   | `rand bit m_x;`                  | 0/1.                           |
+| `object`    | nested generated class           |                                |
+| `array`     | dynamic array `m_x[]` of inner   |                                |
 
 `null` and multi-type unions (`["string", "null"]`) are **not** supported.
 
-Fixture: `tests/fixtures/all_types.json`.
+### Integer width via `format`
+
+Statham strips `format` from numeric elements during parsing, so the keyword
+is harvested from the resolved schema dict (see `serializers/intformat.py`)
+before parse, in the same pattern as `bitvec`/`oneof`.
+
+```json
+{ "type": "integer", "format": "int64" }
+{ "type": "integer", "format": "int32" }
+```
+
+```sv
+rand longint m_long_field;     // 64-bit
+rand int     m_short_field;    // 32-bit (default)
+```
+
+The full 64-bit value round-trips through fromJSON/toJSON; sv-embed-json's
+parser uses `$sscanf("%d", longint)` so values beyond 2^31 are preserved
+end to end. UVM's `print_field_int` is invoked with `bits=64` for `longint`
+properties and `bits=32` for `int`.
+
+Fixture: `tests/fixtures/all_types.json` (`i64`, `i64_arr`).
 
 ---
 

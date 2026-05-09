@@ -19,6 +19,8 @@
       "type": "object",
       "properties": {
         "i":      { "type": "integer", "default": 0 },
+        "i64":    { "type": "integer", "format": "int64" },
+        "i64_arr":{ "type": "array", "items": { "type": "integer", "format": "int64" }, "minItems": 1, "maxItems": 2 },
         "i_excl": { "type": "integer", "exclusiveMinimum": 0, "exclusiveMaximum": 100 },
         "i_mult": { "type": "integer", "multipleOf": 4 },
         "uniq_arr": {
