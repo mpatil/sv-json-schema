@@ -37,13 +37,13 @@
           "region": {
             "type":"string",
             "format":"hex",
-            "width": 32,
+            "x-sv-width": 32,
             "default": "0x0"
           },
           "addr": {
             "type":"string",
             "format":"hex",
-            "width": 32,
+            "x-sv-width": 32,
             "default": "0x0"
           },
           "domain": {
@@ -51,6 +51,12 @@
           },
           "size": {
             "type":"integer"
+          },
+          "mode": {
+            "type":"string",
+            "format":"binary",
+            "x-sv-width": 4,
+            "default": "0b0000"
           }
         }
       },

@@ -55,6 +55,19 @@
           void'($sscanf(_arr_``VAR``.getByIndex(i).asString(), "0x%h", m_``VAR``[i])); \
       end
 
+`define from_json_binary(VAR) \
+      if (jv.getByKey(`"VAR`") != null) \
+        void'($sscanf(jv.getByKey(`"VAR`").asString(), "0b%b", m_``VAR));
+
+`define from_json_binary_array(VAR) \
+      if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
+        Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
+        if (_arr_``VAR``.size() > m_``VAR``.size) \
+          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        for (int i = 0; i < _arr_``VAR``.size(); i++) \
+          void'($sscanf(_arr_``VAR``.getByIndex(i).asString(), "0b%b", m_``VAR``[i])); \
+      end
+
 `define from_json_bool(VAR) \
       if (jv.getByKey(`"VAR`") != null) \
         m_``VAR = jv.getByKey(`"VAR`").isTrue();
@@ -161,6 +174,24 @@
           string s_``VAR; \
           s_``VAR``.hextoa(m_``VAR``[i]); \
           _arr_``VAR``.append(_mkStr({"0x", s_``VAR})); \
+        end \
+        jv.append(`"VAR`", _arr_``VAR); \
+      end
+
+`define to_json_binary(VAR) \
+      begin \
+        string s_``VAR; \
+        s_``VAR``.bintoa(m_``VAR); \
+        jv.append(`"VAR`", _mkStr({"0b", s_``VAR})); \
+      end
+
+`define to_json_binary_array(VAR) \
+      begin \
+        ArrayVal_ _arr_``VAR = new(); \
+        foreach (m_``VAR``[i]) begin \
+          string s_``VAR; \
+          s_``VAR``.bintoa(m_``VAR``[i]); \
+          _arr_``VAR``.append(_mkStr({"0b", s_``VAR})); \
         end \
         jv.append(`"VAR`", _arr_``VAR); \
       end

@@ -6,6 +6,7 @@
     "kind": "STRIPE",
     "name": "addr_map",
     "region": "0x3ddd2fdf",
-    "size": -1582509160
+    "size": -1582509160,
+    "mode": "0b1011"
   }
 ]

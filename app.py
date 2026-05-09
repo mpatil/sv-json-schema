@@ -1,128 +1,144 @@
+"""Generate SystemVerilog config classes and a UVM testbench from a JSON Schema."""
+
+import os
+import sys
 from argparse import ArgumentParser, RawTextHelpFormatter
-from contextlib import contextmanager
-from logging import getLogger, INFO
-from typing import Iterator, TextIO, Tuple
-from sys import argv, stdout, path
-
-from json_ref_dict import materialize, RefDict
-
 from pathlib import Path
+from typing import Iterable, Tuple
 
+from json_ref_dict import RefDict, materialize
 from mako import exceptions
 from mako.template import Template
 
-path.append("statham-schema")
+# statham-schema is consumed via the submodule rather than from PyPI; expose
+# the package on sys.path before importing.
+_REPO_ROOT = Path(__file__).resolve().parent
+sys.path.insert(0, str(_REPO_ROOT / "statham-schema"))
 
-from statham.schema.parser import parse
-from serializers.sv_lang import serialize_sv
-from statham.titles import title_labeller
+from statham.schema.parser import parse  # noqa: E402
+from statham.titles import title_labeller  # noqa: E402
 
-from os import path
+from serializers.bitvec import (  # noqa: E402
+    collect_bitvec_widths,
+    register_format_validators,
+)
+from serializers.sv_lang import serialize_sv  # noqa: E402
 
-LOGGER = getLogger(__name__)
-LOGGER.setLevel(INFO)
+
+_DEFAULT_CLASS_TEMPLATE = _REPO_ROOT / "serializers" / "sv_lang.mako"
+_DEFAULT_TB_TEMPLATE = _REPO_ROOT / "examples" / "sv_lang_tb.mako"
 
 
 def parse_input_arg(input_arg: str) -> str:
-    """Parse input URI as a valid JSON Schema ref.
-
-    This tool accepts bare base URIs, without the JSON Pointer,
-    so these should be converted to a root pointer.
-    """
-    if "#" not in input_arg:
-        return input_arg + "#/"
-    return input_arg
+    """Convert a bare base URI into a full JSON Schema ref (root pointer)."""
+    return input_arg if "#" in input_arg else input_arg + "#/"
 
 
-@contextmanager
-def parse_args(args) -> Iterator[Tuple[str, TextIO]]:
-    """Parse arguments, abstracting IO in a context manager."""
-
+def _parse_args(argv: Iterable[str]):
     parser = ArgumentParser(
-        description="Generate statham models from JSON Schema files.",
+        description=__doc__,
         formatter_class=RawTextHelpFormatter,
-        add_help=False,
     )
-    required = parser.add_argument_group("Required arguments")
-    required.add_argument(
+    parser.add_argument(
         "--input",
-        type=str,
         required=True,
-        help="""Specify the path to the JSON Schema to be generated.
-
-If the target schema is not at the root of a document, specify the
-JSON Pointer in the same format as a JSON Schema `$ref`, e.g.
-`--input path/to/document.json#/definitions/schema`
-
-""",
+        help=(
+            "Path to the JSON Schema. To target a sub-schema, append a JSON\n"
+            "Pointer fragment, e.g. path/to/document.json#/definitions/Schema"
+        ),
     )
-    required.add_argument(
+    parser.add_argument(
+        "--class-out",
+        type=Path,
+        help="Output path for the generated SV class (default: stdout when no outputs given).",
+    )
+    parser.add_argument(
+        "--tb-out",
+        type=Path,
+        help="Output path for the generated UVM testbench.",
+    )
+    parser.add_argument(
+        "--class-template",
+        type=Path,
+        default=_DEFAULT_CLASS_TEMPLATE,
+        help="Override the SV class Mako template.",
+    )
+    parser.add_argument(
+        "--tb-template",
+        type=Path,
+        default=_DEFAULT_TB_TEMPLATE,
+        help="Override the UVM testbench Mako template.",
+    )
+    # Backwards-compatible single-output mode used by older invocations.
+    parser.add_argument(
         "--template",
-        type=str,
-        required=True,
-        help="""
-""",
+        type=Path,
+        help="Single template to render. Pairs with --output.",
     )
-    optional = parser.add_argument_group("Optional arguments")
-    optional.add_argument(
+    parser.add_argument(
         "--output",
-        type=str,
-        default=None,
-        help="""Output directory or file in which to write the output.
-
-If the provided path is a directory, the command will derive the name
-from the input argument. If not passed, the command will write to
-stdout.
-
-""",
+        type=Path,
+        help="Output for --template.",
     )
-    optional.add_argument(
-        "-h",
-        "--help",
-        action="help",
-        help="Display this help message and exit.",
-    )
-    parsed = parser.parse_args(args)
-    input_arg: str = parse_input_arg(parsed.input)
-    template_arg: str = str(parsed.template)
-    if parsed.output:
-        if path.isdir(parsed.output):
-            filename = ".".join(path.basename(parsed.input).split(".")[:-1])
-            output_path = path.join(parsed.output, ".".join([filename, "py"]))
-        else:
-            output_path = parsed.output
-        with open(output_path, "w", encoding="utf8") as file:
-            yield input_arg, template_arg, file
-        return
-    yield input_arg, template_arg, stdout
-    return
+    return parser.parse_args(list(argv))
 
 
-def main(input_uri: str) -> str:
-    """Get a schema from a URI, and then return the generated python module.
+def _resolve_schema(input_uri: str):
+    """Materialise the JSON Schema, returning (parsed elements, bit-vector widths).
 
-    :param input_uri: URI of the target schema. This must follow the conventions
-        of a JSON Schema ``"$ref"`` attribute.
-    :return: Python module contents for generated models, as a string.
+    statham's `parse` mutates the schema dict, so bit-vector metadata is
+    harvested first.
     """
-    schema = materialize(
+    raw = materialize(
         RefDict.from_uri(input_uri), context_labeller=title_labeller()
     )
-    return serialize_sv(*parse(schema))
+    widths = collect_bitvec_widths(raw)
+    return parse(raw), widths
 
 
-def entry_point():
-    """Entry point for command.
+def _render(template_path: Path, params: dict) -> str:
+    try:
+        return Template(filename=str(template_path)).render(params=params)
+    except Exception:
+        sys.stderr.write(exceptions.text_error_template().render())
+        raise
 
-    Parse arguments, read from input and write to output.
-    """
-    with parse_args(argv[1:]) as (uri, tpl, output):
-        in_tpl = Template(filename = str(tpl))
-        try:
-            output.write(in_tpl.render(params = main(uri)))
-        except:
-            print(exceptions.text_error_template().render())
+
+def _write(target, contents: str) -> None:
+    if target is None:
+        sys.stdout.write(contents)
+    else:
+        target = Path(target)
+        if target.is_dir():
+            raise SystemExit(
+                f"--output target {target} is a directory; pass a file path"
+            )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(contents, encoding="utf8")
+
+
+def main(argv: Iterable[str] = None) -> int:
+    register_format_validators()
+    args = _parse_args(sys.argv[1:] if argv is None else argv)
+
+    elements, widths = _resolve_schema(parse_input_arg(args.input))
+    params = serialize_sv(elements, widths)
+
+    if args.template is not None:
+        _write(args.output, _render(args.template, params))
+        return 0
+
+    if args.class_out is None and args.tb_out is None:
+        # No outputs requested → render the class to stdout (matches old default).
+        sys.stdout.write(_render(args.class_template, params))
+        return 0
+
+    if args.class_out is not None:
+        _write(args.class_out, _render(args.class_template, params))
+    if args.tb_out is not None:
+        _write(args.tb_out, _render(args.tb_template, params))
+    return 0
 
 
 if __name__ == "__main__":
-    entry_point()
+    raise SystemExit(main())

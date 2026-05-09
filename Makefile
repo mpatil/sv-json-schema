@@ -8,9 +8,8 @@ clean:
 	@/bin/rm -rf __pycache__ serializers/__pycache__
 	@/bin/rm -rf config_m.sv testbench.sv *.json
 
-config_m.sv: examples/${EXAMPLE}.json serializers/sv_lang.mako serializers/sv_lang.py
-	python3 app.py --input examples/${EXAMPLE}.json --template serializers/sv_lang.mako --output config_m.sv
-	@python3 app.py --input examples/${EXAMPLE}.json --template examples/sv_lang_tb.mako --output testbench.sv
+config_m.sv testbench.sv: examples/${EXAMPLE}.json serializers/sv_lang.mako serializers/sv_lang.py serializers/bitvec.py examples/sv_lang_tb.mako
+	python3 app.py --input examples/${EXAMPLE}.json --class-out config_m.sv --tb-out testbench.sv
 
 run: config_m.sv testbench.sv
 	qrun -64 -sv -mfcu -permissive -uvm -uvmhome uvm-1.2 -f sv_tb.f testbench.sv +UVM_VERBOSITY=UVM_MEDIUM

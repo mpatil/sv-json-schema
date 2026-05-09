@@ -64,6 +64,11 @@ class config_m extends uvm_object;
             foreach (m_{n}[i]) begin
                 printer.print_field_int("{n}", m_{n}[i], {mem['width']}, UVM_HEX);
             end""")
+            elif mem['type_cat'] == "binary_array":
+                prnt_s.append(f"""\
+            foreach (m_{n}[i]) begin
+                printer.print_field_int("{n}", m_{n}[i], {mem['width']}, UVM_BIN);
+            end""")
             elif mem['type_cat'] == "object_array":
                 prand_s.append(f"""\
             foreach (m_{n}[i]) begin
@@ -105,6 +110,9 @@ class config_m extends uvm_object;
             elif mem['type_cat'] == "hex":
                 prnt_s.append(f"""\
             printer.print_field_int("{n}", m_{n}, {mem['width']}, UVM_HEX);""")
+            elif mem['type_cat'] == "binary":
+                prnt_s.append(f"""\
+            printer.print_field_int("{n}", m_{n}, {mem['width']}, UVM_BIN);""")
             elif mem['type_cat'] == "object":
                 prand_s.append(f"""\
             m_{n} = new("{n}");
