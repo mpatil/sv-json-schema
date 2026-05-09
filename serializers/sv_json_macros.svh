@@ -138,6 +138,19 @@
         m_``VAR = _t_``VAR; \
       end
 
+`define from_json_oneof(VAR, BASE) \
+      if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isObject()) \
+        m_``VAR = BASE``::fromJSONFactory(jv.getByKey(`"VAR`"));
+
+`define from_json_oneof_array(VAR, BASE) \
+      if (jv.getByKey(`"VAR`") != null && jv.getByKey(`"VAR`").isArray()) begin \
+        Val_ _arr_``VAR = jv.getByKey(`"VAR`"); \
+        if (_arr_``VAR``.size() > m_``VAR``.size) \
+          m_``VAR = new [_arr_``VAR``.size()] (m_``VAR); \
+        for (int i = 0; i < _arr_``VAR``.size(); i++) \
+          m_``VAR``[i] = BASE``::fromJSONFactory(_arr_``VAR``.getByIndex(i)); \
+      end
+
 `define to_json_enum(VAR) \
       jv.append(`"VAR`", _mkStr(m_``VAR``.name()));
 
@@ -244,5 +257,17 @@
           $cast(_t_``VAR, m_``VAR``[i]); \
           _arr_``VAR``.append(_t_``VAR``.toJSON()); \
         end \
+        jv.append(`"VAR`", _arr_``VAR); \
+      end
+
+`define to_json_oneof(VAR) \
+      if (m_``VAR != null) jv.append(`"VAR`", m_``VAR``.toJSON());
+
+`define to_json_oneof_array(VAR) \
+      begin \
+        ArrayVal_ _arr_``VAR = new(); \
+        foreach (m_``VAR``[i]) \
+          if (m_``VAR``[i] != null) \
+            _arr_``VAR``.append(m_``VAR``[i].toJSON()); \
         jv.append(`"VAR`", _arr_``VAR); \
       end

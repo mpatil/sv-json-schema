@@ -11,6 +11,7 @@ class config_m extends uvm_object;
     typedef class Inner;
     typedef class AllTypes;
 
+
     class Inner extends uvm_object;
         `uvm_object_utils(Inner)
 

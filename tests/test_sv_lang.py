@@ -13,6 +13,7 @@ from statham.schema.parser import parse
 from statham.titles import title_labeller
 
 from serializers.bitvec import collect_bitvec_widths
+from serializers.oneof import collect_oneof_props, collect_oneofs
 from serializers.sv_lang import serialize_sv
 
 
@@ -26,8 +27,21 @@ def all_types_params(fixtures_dir):
     return serialize_sv(parse(raw), widths)
 
 
-def _props_by_name(class_props):
-    return {p["name"]: p for p in class_props}
+@pytest.fixture(scope="module")
+def with_oneof_params(fixtures_dir):
+    raw = materialize(
+        RefDict.from_uri(f"{fixtures_dir / 'with_oneof.json'}#/"),
+        context_labeller=title_labeller(),
+    )
+    widths = collect_bitvec_widths(raw)
+    oneofs = collect_oneofs(raw)
+    oneof_props = collect_oneof_props(raw)
+    return serialize_sv(parse(raw), widths, oneofs, oneof_props)
+
+
+def _props_by_name(class_dict):
+    """Index a class entry's member list by property name."""
+    return {p["name"]: p for p in class_dict["members"]}
 
 
 class TestEnumSection:
@@ -105,3 +119,30 @@ class TestClassesSection:
         assert props["s"]["def"] == '"default"'
         assert props["h"]["def"] == "'h0"
         assert props["bn"]["def"] == "'b0000"
+
+
+class TestOneOfSection:
+    def test_anymap_in_oneofs(self, with_oneof_params):
+        oneofs = with_oneof_params["oneOfs"]
+        assert "AnyMap" in oneofs
+        assert oneofs["AnyMap"]["discriminator"] == "kind"
+        branches = {b["name"]: b["value"] for b in oneofs["AnyMap"]["branches"]}
+        assert branches == {"AddrMap": "addr", "RegMap": "reg"}
+
+    def test_branches_extend_base(self, with_oneof_params):
+        cs = with_oneof_params["classes"]
+        assert cs["AddrMap"]["extends"] == "AnyMap"
+        assert cs["RegMap"]["extends"] == "AnyMap"
+        # Cfg is a regular class — not a branch.
+        assert cs["Cfg"]["extends"] == "uvm_object"
+
+    def test_cfg_map_is_oneof_typed(self, with_oneof_params):
+        props = _props_by_name(with_oneof_params["classes"]["Cfg"])
+        assert props["map"]["type_cat"] == "oneof"
+        assert props["map"]["type"] == "AnyMap"
+        assert props["map"]["oneOfBase"] == "AnyMap"
+        assert props["map"]["isRand"] is False
+
+    def test_anymap_not_in_classes(self, with_oneof_params):
+        # Base classes live in `oneOfs`; only concrete classes go in `classes`.
+        assert "AnyMap" not in with_oneof_params["classes"]

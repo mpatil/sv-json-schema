@@ -22,6 +22,7 @@ from serializers.bitvec import (  # noqa: E402
     collect_bitvec_widths,
     register_format_validators,
 )
+from serializers.oneof import collect_oneof_props, collect_oneofs  # noqa: E402
 from serializers.sv_lang import serialize_sv  # noqa: E402
 
 
@@ -69,6 +70,11 @@ def _parse_args(argv: Iterable[str]):
         default=_DEFAULT_TB_TEMPLATE,
         help="Override the UVM testbench Mako template.",
     )
+    parser.add_argument(
+        "--tb-data-dir",
+        default="examples/data",
+        help="Directory the generated testbench reads input JSON files from.",
+    )
     # Backwards-compatible single-output mode used by older invocations.
     parser.add_argument(
         "--template",
@@ -84,16 +90,19 @@ def _parse_args(argv: Iterable[str]):
 
 
 def _resolve_schema(input_uri: str):
-    """Materialise the JSON Schema, returning (parsed elements, bit-vector widths).
+    """Materialise the JSON Schema, returning (parsed elements, side-tables).
 
-    statham's `parse` mutates the schema dict, so bit-vector metadata is
-    harvested first.
+    statham's `parse` mutates the schema dict, so non-statham metadata
+    (bit-vector widths, oneOf groups + their property usages) is harvested
+    first.
     """
     raw = materialize(
         RefDict.from_uri(input_uri), context_labeller=title_labeller()
     )
     widths = collect_bitvec_widths(raw)
-    return parse(raw), widths
+    oneofs = collect_oneofs(raw)
+    oneof_props = collect_oneof_props(raw)
+    return parse(raw), widths, oneofs, oneof_props
 
 
 def _render(template_path: Path, params: dict) -> str:
@@ -121,8 +130,9 @@ def main(argv: Iterable[str] = None) -> int:
     register_format_validators()
     args = _parse_args(sys.argv[1:] if argv is None else argv)
 
-    elements, widths = _resolve_schema(parse_input_arg(args.input))
-    params = serialize_sv(elements, widths)
+    elements, widths, oneofs, oneof_props = _resolve_schema(parse_input_arg(args.input))
+    params = serialize_sv(elements, widths, oneofs, oneof_props)
+    params["data_dir"] = args.tb_data_dir.rstrip("/")
 
     if args.template is not None:
         _write(args.output, _render(args.template, params))

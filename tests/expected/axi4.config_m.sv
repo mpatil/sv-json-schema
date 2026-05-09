@@ -28,6 +28,7 @@ class config_m extends uvm_object;
     typedef class MasterCfg;
     typedef class SlaveCfg;
 
+
     class AddrMap extends uvm_object;
         `uvm_object_utils(AddrMap)
 

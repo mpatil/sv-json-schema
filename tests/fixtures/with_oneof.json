@@ -1,0 +1,39 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "OneOfFixture",
+  "description": "Exercises a top-level oneOf with a discriminator + branch defaults.",
+  "definitions": {
+    "AddrMap": {
+      "type": "object",
+      "properties": {
+        "kind":   { "type": "string", "default": "addr" },
+        "size":   { "type": "integer", "default": 0 },
+        "region": { "type": "string", "format": "hex", "x-sv-width": 32, "default": "0x0" }
+      },
+      "required": ["kind", "size"]
+    },
+    "RegMap": {
+      "type": "object",
+      "properties": {
+        "kind":   { "type": "string", "default": "reg" },
+        "offset": { "type": "integer", "default": 0 }
+      },
+      "required": ["kind", "offset"]
+    },
+    "AnyMap": {
+      "oneOf": [
+        { "$ref": "#/definitions/AddrMap" },
+        { "$ref": "#/definitions/RegMap" }
+      ],
+      "discriminator": {"propertyName": "kind"}
+    },
+    "Cfg": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "default": "cfg" },
+        "map":  { "$ref": "#/definitions/AnyMap" }
+      },
+      "required": ["map"]
+    }
+  }
+}

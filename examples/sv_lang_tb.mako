@@ -9,7 +9,7 @@ program top();
 
 % for ty in params['classes']:
   initial begin
-      automatic Val_ jv = pJSON("examples/data/${ty}.json");
+      automatic Val_ jv = pJSON("${params['data_dir']}/${ty}.json");
 
       if (jv == null) begin
         $display("JSON parse failed: ${ty}");

@@ -12,11 +12,58 @@ class config_m extends uvm_object;
 
 % endfor
 
+% for base in params['oneOfs']:
+    typedef class ${base};
+% endfor
 % for ty in params['classes']:
     typedef class ${ty};
 % endfor
 
-% for ty in params['classes']:
+% for base, spec in params['oneOfs'].items():
+<%
+    disc = spec['discriminator']
+    cases = '\n              '.join(
+        f'"{br["value"]}": begin {br["name"]} _t = new(""); _t.fromJSON(jv); result = _t; end'
+        for br in spec['branches']
+    )
+%>\
+    class ${base} extends uvm_object;
+        `uvm_object_utils(${base})
+
+        function new (string name ="");
+            super.new(name);
+        endfunction : new
+
+`ifdef JSON_PKG
+        static function ${base} fromJSONFactory(Val_ jv);
+            string disc;
+            ${base} result = null;
+            if (jv == null) return null;
+            if (jv.getByKey("${disc}") == null) begin
+              `uvm_error("${base}", "discriminator field \"${disc}\" missing from input")
+              return null;
+            end
+            disc = jv.getByKey("${disc}").asString();
+            case (disc)
+              ${cases}
+              default: `uvm_error("${base}", $sformatf("unknown ${disc}: %s", disc))
+            endcase
+            return result;
+        endfunction : fromJSONFactory
+
+        virtual function void fromJSON(Val_ jv);
+        endfunction : fromJSON
+
+        virtual function ObjectVal_ toJSON();
+            ObjectVal_ jv = new();
+            return jv;
+        endfunction : toJSON
+`endif
+    endclass
+
+% endfor
+
+% for ty, cls in params['classes'].items():
 <%
     mem_s   = []
     con_s   = []
@@ -24,12 +71,17 @@ class config_m extends uvm_object;
     fjson_s = []
     tjson_s = []
     prnt_s  = []
-    for mem in params['classes'][ty]:
+    for mem in cls['members']:
         n = mem['name']
         r = f"rand " if mem['isRand'] else ""
         w = f" [{mem['width']}-1:0]" if mem['width'] is not None else ""
         m = f"{r}{mem['type']}{w} m_{n}"
-        e = f", {mem['type']}" if mem['isEnum'] else ""
+        if mem['type_cat'] in ("oneof", "oneof_array"):
+            e = f", {mem['oneOfBase']}"
+        elif mem['isEnum']:
+            e = f", {mem['type']}"
+        else:
+            e = ""
 
         if mem.get('isRequired'):
             fjson_s.append(
@@ -84,6 +136,11 @@ class config_m extends uvm_object;
             foreach (m_{n}[i]) begin
                 printer.print_object("{n}", m_{n}[i]);
             end""")
+            elif mem['type_cat'] == "oneof_array":
+                prnt_s.append(f"""\
+            foreach (m_{n}[i]) begin
+                if (m_{n}[i] != null) printer.print_object("{n}", m_{n}[i]);
+            end""")
 
             xi = "" if mem['minItems'] is None else f"m_{n}.size >= {mem['minItems']}; "
             ni = "" if mem['maxItems'] is None else f"m_{n}.size <= {mem['maxItems']}; "
@@ -124,6 +181,9 @@ class config_m extends uvm_object;
             void'(m_{n}.randomize());""")
                 prnt_s.append(f"""\
             printer.print_object("{n}", m_{n});""")
+            elif mem['type_cat'] == "oneof":
+                prnt_s.append(f"""\
+            if (m_{n} != null) printer.print_object("{n}", m_{n});""")
 
             if mem['def']:
                 mem_s.append(f"{m} = {mem['def']};")
@@ -140,7 +200,7 @@ class config_m extends uvm_object;
     fjsons = '\n            '.join(fjson_s)
     prnts  = '\n'.join(prnt_s)
 %>\
-    class ${ty} extends uvm_object;
+    class ${ty} extends ${cls['extends']};
         `uvm_object_utils(${ty})
 
         ${mems}

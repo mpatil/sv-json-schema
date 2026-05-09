@@ -21,6 +21,7 @@ from statham.schema.elements.meta import ObjectMeta
 from statham.serializers.orderer import orderer
 
 from serializers.bitvec import BitVec, RADIX_BINARY, RADIX_HEX, WidthMap
+from serializers.oneof import OneOfMap, OneOfPropMap
 
 
 T = TypeVar("T")
@@ -150,10 +151,19 @@ def _scalar_constraints(p: str, elem: Element) -> Dict[str, Any]:
     }
 
 
+def _branch_to_base(oneofs: OneOfMap) -> Dict[str, str]:
+    """Reverse-index oneOf branches: branch_class_name -> base_class_name."""
+    return {b.name: base for base, spec in oneofs.items() for b in spec.branches}
+
+
 def _serialize_classes(
-    elements: Tuple[Element, ...], widths: WidthMap
-) -> Dict[str, List[Dict[str, Any]]]:
-    cs: Dict[str, List[Dict[str, Any]]] = {}
+    elements: Tuple[Element, ...],
+    widths: WidthMap,
+    oneofs: OneOfMap,
+    oneof_props: OneOfPropMap,
+) -> Dict[str, Dict[str, Any]]:
+    branch_to_base = _branch_to_base(oneofs)
+    cs: Dict[str, Dict[str, Any]] = {}
     for o in orderer(*elements):
         if not isinstance(o.enum, NotPassed):
             continue
@@ -163,15 +173,24 @@ def _serialize_classes(
             elem = o._properties[p].element
             bv = widths.get((owner, p))
             ty, is_rand = sv_type(elem, bv)
+            base = oneof_props.get((owner, p))
+            if base is not None:
+                # Override inferred type/category with the oneOf base class.
+                ty = base
+                is_rand = False  # oneOf-typed fields aren't safe to randomize
+                cat = "oneof_array" if isinstance(elem, Array) else "oneof"
+            else:
+                cat = json_type(elem, bv)
             prop: Dict[str, Any] = {
                 "name": p,
-                "type_cat": json_type(elem, bv),
+                "type_cat": cat,
                 "type": ty,
                 "isRand": is_rand,
                 "def": sv_def(elem, bv),
                 "width": sv_width(bv),
                 "isArray": isinstance(elem, Array),
                 "isRequired": bool(o._properties[p].required),
+                "oneOfBase": base,
             }
             prop.update(
                 _array_constraints(p, elem)
@@ -179,15 +198,37 @@ def _serialize_classes(
                 else _scalar_constraints(p, elem)
             )
             ms.append(prop)
-        cs[owner] = ms
+        cs[owner] = {
+            "members": ms,
+            "extends": branch_to_base.get(owner, "uvm_object"),
+        }
     return cs
 
 
+def _serialize_oneofs(oneofs: OneOfMap) -> Dict[str, Dict[str, Any]]:
+    """Render oneOf base classes for the Mako template."""
+    return {
+        base: {
+            "discriminator": spec.discriminator,
+            "branches": [
+                {"name": b.name, "value": b.value} for b in spec.branches
+            ],
+        }
+        for base, spec in oneofs.items()
+    }
+
+
 def serialize_sv(
-    elements: Tuple[Element, ...], widths: Optional[WidthMap] = None
+    elements: Tuple[Element, ...],
+    widths: Optional[WidthMap] = None,
+    oneofs: Optional[OneOfMap] = None,
+    oneof_props: Optional[OneOfPropMap] = None,
 ) -> Dict[str, Any]:
     widths = widths or {}
+    oneofs = oneofs or {}
+    oneof_props = oneof_props or {}
     return {
         "enums": _serialize_enums(elements),
-        "classes": _serialize_classes(elements, widths),
+        "classes": _serialize_classes(elements, widths, oneofs, oneof_props),
+        "oneOfs": _serialize_oneofs(oneofs),
     }

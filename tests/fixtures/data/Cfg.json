@@ -1,0 +1,17 @@
+[
+  {
+    "name": "as_addr",
+    "map": {
+      "kind": "addr",
+      "size": 4096,
+      "region": "0xdeadbeef"
+    }
+  },
+  {
+    "name": "as_reg",
+    "map": {
+      "kind": "reg",
+      "offset": 17
+    }
+  }
+]

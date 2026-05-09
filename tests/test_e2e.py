@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import json
 import subprocess
+import sys
 
 import pytest
 
@@ -84,4 +85,132 @@ def test_required_field_missing_emits_uvm_error(
     combined = result.stdout + result.stderr
     assert 'required field "addr" missing' in combined, (
         f"expected required-field uvm_error not in sim output:\n{combined}"
+    )
+
+
+# ---------------------------------------------------------------------------
+# oneOf
+# ---------------------------------------------------------------------------
+
+
+def _generate(repo_root, schema, class_out, tb_out, data_dir):
+    subprocess.run(
+        [
+            sys.executable,
+            str(repo_root / "app.py"),
+            "--input",
+            str(schema),
+            "--class-out",
+            str(class_out),
+            "--tb-out",
+            str(tb_out),
+            "--tb-data-dir",
+            str(data_dir),
+        ],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _build_oneof_workspace(repo_root, fixtures_dir, tmp_path, data_dir):
+    """Generate SV in tmp_path and bring in runtime deps via symlinks."""
+    _generate(
+        repo_root=repo_root,
+        schema=fixtures_dir / "with_oneof.json",
+        class_out=tmp_path / "config_m.sv",
+        tb_out=tmp_path / "testbench.sv",
+        data_dir=data_dir,
+    )
+    for name in ("sv-embed-json", "serializers", "sv_tb.f"):
+        (tmp_path / name).symlink_to(repo_root / name)
+    return tmp_path
+
+
+def _vcs_compile_and_run(workspace):
+    subprocess.run(
+        [
+            "vcs",
+            "-full64",
+            "-sverilog",
+            "-ntb_opts",
+            "uvm-1.2",
+            "-timescale=1ns/1ps",
+            "-f",
+            "sv_tb.f",
+            "testbench.sv",
+        ],
+        cwd=workspace,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=_TIMEOUT_SECONDS,
+    )
+    return subprocess.run(
+        ["./simv", "+UVM_VERBOSITY=UVM_MEDIUM", "+vcs+lic+wait"],
+        cwd=workspace,
+        check=True,
+        capture_output=True,
+        text=True,
+        timeout=_TIMEOUT_SECONDS,
+    )
+
+
+def test_oneof_roundtrip_dispatches_by_discriminator(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """Generated factory must pick the right concrete subclass per discriminator."""
+    if simulator != "vcs":
+        pytest.skip("oneOf e2e currently requires vcs")
+
+    data_dir = fixtures_dir / "data"
+    workspace = _build_oneof_workspace(repo_root, fixtures_dir, tmp_path, data_dir)
+    _vcs_compile_and_run(workspace)
+
+    cfg0 = json.loads((workspace / "Cfg0.json").read_text(encoding="utf8"))
+    cfg1 = json.loads((workspace / "Cfg1.json").read_text(encoding="utf8"))
+
+    # First record exercises the "addr" branch.
+    assert cfg0["name"] == "as_addr"
+    assert cfg0["map"]["kind"] == "addr"
+    assert cfg0["map"]["size"] == 4096
+    assert cfg0["map"]["region"] == "0xdeadbeef"
+
+    # Second record exercises the "reg" branch via the same field.
+    assert cfg1["name"] == "as_reg"
+    assert cfg1["map"]["kind"] == "reg"
+    assert cfg1["map"]["offset"] == 17
+
+
+def test_oneof_unknown_discriminator_emits_uvm_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """An unknown discriminator value should fire the factory's uvm_error."""
+    if simulator != "vcs":
+        pytest.skip("oneOf e2e currently requires vcs")
+
+    # Build a parallel data dir whose Cfg.json has a bogus `kind` value.
+    rogue_data_dir = tmp_path / "rogue_data"
+    rogue_data_dir.mkdir()
+    bogus = [
+        {
+            "name": "bogus",
+            "map": {"kind": "rocket", "size": 1, "offset": 1},
+        }
+    ]
+    (rogue_data_dir / "Cfg.json").write_text(json.dumps(bogus, indent=2))
+    (rogue_data_dir / "AddrMap.json").write_text(
+        (fixtures_dir / "data" / "AddrMap.json").read_text(encoding="utf8")
+    )
+    (rogue_data_dir / "RegMap.json").write_text(
+        (fixtures_dir / "data" / "RegMap.json").read_text(encoding="utf8")
+    )
+
+    workspace = _build_oneof_workspace(
+        repo_root, fixtures_dir, tmp_path / "ws", rogue_data_dir
+    )
+    sim = _vcs_compile_and_run(workspace)
+    assert "unknown kind: rocket" in (sim.stdout + sim.stderr), (
+        f"expected oneOf uvm_error not in sim output:\n{sim.stdout}\n{sim.stderr}"
     )

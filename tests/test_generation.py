@@ -18,6 +18,7 @@ GENERATION_CASES = [
     # (case_name, schema_path_template_relative_to_repo)
     ("axi4", "examples/axi4_cfg_schema.json"),
     ("all_types", "tests/fixtures/all_types.json"),
+    ("with_oneof", "tests/fixtures/with_oneof.json"),
 ]
 
 
