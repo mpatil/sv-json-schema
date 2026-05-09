@@ -1,18 +1,77 @@
 ![](https://img.shields.io/badge/license-MIT-green)
 
 # sv-json-schema
-This is a tool to generate a SystemVerilog configuration class from a schema specification of the data. The data format is JSON.
 
-## Introduction
+Generate SystemVerilog configuration classes (UVM-based) from JSON Schema.
+Each generated class can:
 
-Given a JSON schema specification of data, the tool produces a systemverilog class which when instantiated as an object can read and parse a JSON data file(conforming to the specified schema), dump a JSON file of the its representation and randomize its data in the specified constrained manner.
+* deserialize an input JSON file into typed members (`fromJSON`)
+* serialize itself back to JSON (`toJSON`)
+* be randomized under the constraints declared in the schema
 
-The json schema library used is statham-schema. The SystemVerilog serializer/deserializer is built on sv-embed-json.
+## How it fits together
 
-## Reference
+```
+                                  +-------------------------+
+schema.json  --(json_ref_dict)--> | resolved schema dict    |
+                                  +-----------+-------------+
+                                              |
+                                              v
+                            +-------------------------------+
+                            | side-tables harvested before  |
+                            | statham mutates the dict:     |
+                            |   - bit-vector widths         |
+                            |   - oneOf bases + branches    |
+                            +-----------+-------------------+
+                                        |
+                                        v        +-------------------+
+                            statham.parse  ----> | typed Element tree|
+                                                 +---------+---------+
+                                                           |
+                                                           v
+                                          serializers.sv_lang.serialize_sv
+                                                           |
+                                                           v
+                                                  +--------+--------+
+                                                  | params for Mako |
+                                                  +--------+--------+
+                                                           |
+                            sv_lang.mako, sv_lang_tb.mako  |
+                                                           v
+                                                config_m.sv, testbench.sv
+```
 
-1. [statham-schema](https://github.com/jacksmith15/statham-schema)
-1. [sv-embed-json](https://github.com/mpatil/sv-embed-json)
+The runtime SV side uses [sv-embed-json](https://github.com/mpatil/sv-embed-json)
+for parsing JSON files into a `Val_` tree.
+
+## Features at a glance
+
+For each construct, see [`docs/FEATURES.md`](docs/FEATURES.md) for input → SV
+output examples and the test fixture that exercises it.
+
+| JSON Schema construct                                     | Status |
+|-----------------------------------------------------------|--------|
+| `string`, `integer`, `number`, `boolean`, `object`, `array` | done |
+| `default`                                                 | done |
+| `required` (uvm_error on missing key)                     | done |
+| `const` (string / integer / boolean)                      | done |
+| `format: "hex"` / `format: "binary"` + `x-sv-width: N`    | done |
+| object-with-enum (statham idiom)                          | done |
+| plain `enum` on string                                    | done |
+| plain `enum` on integer                                   | done |
+| `minimum`, `maximum`                                      | done |
+| `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`      | done |
+| `minLength`, `maxLength`                                  | done |
+| `minItems`, `maxItems`, `uniqueItems`                     | done |
+| `additionalProperties: false`                             | done |
+| `oneOf` (top-level definition, with `discriminator`)      | done |
+| `$ref` (intra-document and external file)                 | done |
+| recursive `$ref`, `null`, multi-type union, `pattern`     | not yet — see `TODO.md` |
+
+## References
+
+1. [statham-schema](https://github.com/jacksmith15/statham-schema) — JSON Schema parser
+1. [sv-embed-json](https://github.com/mpatil/sv-embed-json) — SV runtime JSON parser
 1. [JSON Schema](https://json-schema.org/)
 
 ## Development
@@ -24,6 +83,9 @@ The json schema library used is statham-schema. The SystemVerilog serializer/des
 1. Run the default generation with Questa: `make`
 1. Or run with VCS: `make vcsrun`
 
+The default `make` target generates against `examples/axi4_cfg_schema.json`;
+override the example with `make EXAMPLE=other_schema_basename`.
+
 ## Tests
 
 * `make test` — full pytest run (unit + golden + end-to-end). The end-to-end
@@ -31,3 +93,6 @@ The json schema library used is statham-schema. The SystemVerilog serializer/des
 * `make test-fast` — unit and golden tests only; no simulator required.
 * `make update-golden` — refresh `tests/expected/*.config_m.sv` and
   `*.testbench.sv` after an intentional generator change.
+
+The full layout under `tests/` is described in `docs/FEATURES.md` — every
+supported feature has a corresponding fixture in `tests/fixtures/`.
