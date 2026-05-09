@@ -171,6 +171,7 @@ def _serialize_classes(
                 "def": sv_def(elem, bv),
                 "width": sv_width(bv),
                 "isArray": isinstance(elem, Array),
+                "isRequired": bool(o._properties[p].required),
             }
             prop.update(
                 _array_constraints(p, elem)

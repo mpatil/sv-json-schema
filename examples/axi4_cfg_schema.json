@@ -58,7 +58,8 @@
             "x-sv-width": 4,
             "default": "0b0000"
           }
-        }
+        },
+        "required": ["addr", "size"]
       },
       "Cfg": {
         "type": "object",

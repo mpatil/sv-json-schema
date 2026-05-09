@@ -31,6 +31,11 @@ class config_m extends uvm_object;
         m = f"{r}{mem['type']}{w} m_{n}"
         e = f", {mem['type']}" if mem['isEnum'] else ""
 
+        if mem.get('isRequired'):
+            fjson_s.append(
+                f'if (jv.getByKey("{n}") == null) '
+                f'`uvm_error(get_full_name(), "required field \\"{n}\\" missing from input")'
+            )
         fjson_s.append(f"`from_json_{mem['type_cat']}({n}{e})")
         tjson_s.append(f"`to_json_{mem['type_cat']}({n})")
 
