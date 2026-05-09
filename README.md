@@ -7,12 +7,12 @@ This is a tool to generate a SystemVerilog configuration class from a schema spe
 
 Given a JSON schema specification of data, the tool produces a systemverilog class which when instantiated as an object can read and parse a JSON data file(conforming to the specified schema), dump a JSON file of the its representation and randomize its data in the specified constrained manner.
 
-The json schema library used is statham-schema. The SystemVerilog serializer deserializer comes from JSONinSV.
+The json schema library used is statham-schema. The SystemVerilog serializer/deserializer is built on sv-embed-json.
 
 ## Reference
 
 1. [statham-schema](https://github.com/jacksmith15/statham-schema)
-1. [JSONinSV](https://github.com/zhouchuanrui/JSONinSV)
+1. [sv-embed-json](https://github.com/mpatil/sv-embed-json)
 1. [JSON Schema](https://json-schema.org/)
 
 ## Development

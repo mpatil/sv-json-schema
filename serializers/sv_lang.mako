@@ -149,15 +149,16 @@ ${prands}
         endfunction : post_randomize
 
 `ifdef JSON_PKG
-        virtual function void fromJSON(JSONValue jv);
+        virtual function void fromJSON(Val_ jv);
             ${fjsons}
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
-        virtual function void toJSON(ref JSONValue jv);
-            jv.setObject();
+        virtual function ObjectVal_ toJSON();
+            ObjectVal_ jv = new();
             ${tjsons}
+            return jv;
         endfunction : toJSON
 `endif
 

@@ -1,1 +1,16 @@
 __pycache__
+config_m.sv
+testbench.sv
+qrun.out
+modelsim.ini
+qrun.log
+vsim_stacktrace.vstf
+simv
+simv.daidir
+csrc
+ucli.key
+vc_hdrs.h
+*.vpd
+*.fsdb
+novas.*
+DVEfiles
