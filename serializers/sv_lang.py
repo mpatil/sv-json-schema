@@ -113,40 +113,55 @@ def _serialize_enums(elements: Tuple[Element, ...]) -> Dict[str, List[str]]:
     return es
 
 
+_RANGE_KEYWORDS: Tuple[Tuple[str, str], ...] = (
+    ("minimum", ">="),
+    ("maximum", "<="),
+    ("exclusiveMinimum", ">"),
+    ("exclusiveMaximum", "<"),
+)
+
+
+def _attr(elem: Element, name: str) -> Any:
+    """Return statham element attr or None when absent / NotPassed."""
+    val = getattr(elem, name, None)
+    if val is None or isinstance(val, NotPassed):
+        return None
+    return val
+
+
+def _range_constraints(target: str, elem: Element) -> List[str]:
+    """Build the list of SV range expressions (no trailing semicolons)."""
+    out: List[str] = []
+    for attr, op in _RANGE_KEYWORDS:
+        bound = _attr(elem, attr)
+        if bound is not None:
+            out.append(f"{target} {op} {bound}")
+    multiple_of = _attr(elem, "multipleOf")
+    if multiple_of is not None:
+        out.append(f"{target} % {multiple_of} == 0")
+    return out
+
+
 def _array_constraints(p: str, elem: Array) -> Dict[str, Any]:
+    item_parts = _range_constraints(f"m_{p}[i]", elem.items)
+    range_constraints: List[str] = []
+    if item_parts:
+        range_constraints.append(
+            f"foreach (m_{p}[i]) {{ {'; '.join(item_parts)}; }}"
+        )
     return {
         "maxItems": _maybe(elem.maxItems, None),
         "minItems": _maybe(elem.minItems, None),
-        "maximum": (
-            f"foreach ( m_{p}[i] ) {{ m_{p}[i] <= {elem.items.maximum} }}; "
-            if getattr(elem.items, "maximum", None) is not None
-            and not isinstance(elem.items.maximum, NotPassed)
-            else ""
-        ),
-        "minimum": (
-            f"foreach ( m_{p}[i] ) {{ m_{p}[i] >= {elem.items.minimum} }}; "
-            if getattr(elem.items, "minimum", None) is not None
-            and not isinstance(elem.items.minimum, NotPassed)
-            else ""
-        ),
+        "rangeConstraints": range_constraints,
+        "uniqueItems": bool(getattr(elem, "uniqueItems", False)),
         "isEnum": not isinstance(elem.items.enum, NotPassed),
     }
 
 
 def _scalar_constraints(p: str, elem: Element) -> Dict[str, Any]:
     return {
-        "maximum": (
-            f"m_{p} <= {elem.maximum}; "
-            if getattr(elem, "maximum", None) is not None
-            and not isinstance(elem.maximum, NotPassed)
-            else ""
-        ),
-        "minimum": (
-            f"m_{p} >= {elem.minimum}; "
-            if getattr(elem, "minimum", None) is not None
-            and not isinstance(elem.minimum, NotPassed)
-            else ""
-        ),
+        "rangeConstraints": _range_constraints(f"m_{p}", elem),
+        "uniqueItems": False,
         "isEnum": not isinstance(elem.enum, NotPassed),
     }
 

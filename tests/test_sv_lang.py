@@ -112,6 +112,28 @@ class TestClassesSection:
         assert props["i_arr"]["minItems"] == 1
         assert props["i_arr"]["maxItems"] == 4
 
+    def test_exclusive_min_max_constraints(self, all_types_params):
+        props = _props_by_name(all_types_params["classes"]["AllTypes"])
+        assert props["i_excl"]["rangeConstraints"] == [
+            "m_i_excl > 0",
+            "m_i_excl < 100",
+        ]
+
+    def test_multiple_of_constraint(self, all_types_params):
+        props = _props_by_name(all_types_params["classes"]["AllTypes"])
+        assert props["i_mult"]["rangeConstraints"] == ["m_i_mult % 4 == 0"]
+
+    def test_unique_items_constraint(self, all_types_params):
+        props = _props_by_name(all_types_params["classes"]["AllTypes"])
+        assert props["uniq_arr"]["uniqueItems"] is True
+        # Non-unique array should report False.
+        assert props["i_arr"]["uniqueItems"] is False
+
+    def test_scalar_props_have_no_unique(self, all_types_params):
+        props = _props_by_name(all_types_params["classes"]["AllTypes"])
+        # A scalar (non-array) field should never get uniqueItems=True.
+        assert props["i"]["uniqueItems"] is False
+
     def test_defaults_passed_through(self, all_types_params):
         props = _props_by_name(all_types_params["classes"]["AllTypes"])
         assert props["i"]["def"] == "0"

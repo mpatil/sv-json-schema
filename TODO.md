@@ -10,8 +10,8 @@ branch.
 | 2 | Plain `enum` on string / integer                            | M      | open   |
 | 3 | `oneOf` composition (discriminator-based, top-level only)   | L      | done   |
 | 4 | `additionalProperties: false` (warn/error on unknown keys)  | S      | open   |
-| 5 | `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`        | XS     | open   |
-| 6 | `pattern` (regex)  /  `uniqueItems`                         | M / S  | open   |
+| 5 | `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`        | XS     | done   |
+| 6 | `pattern` (regex) — open / `uniqueItems` — done             | M / S  | partial |
 | 7 | Recursive `$ref` (forward declarations + cycle handling)    | M      | open   |
 | 8 | `null` type / multi-type unions                             | L      | open   |
 

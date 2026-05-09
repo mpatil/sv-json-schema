@@ -19,6 +19,15 @@
       "type": "object",
       "properties": {
         "i":      { "type": "integer", "default": 0 },
+        "i_excl": { "type": "integer", "exclusiveMinimum": 0, "exclusiveMaximum": 100 },
+        "i_mult": { "type": "integer", "multipleOf": 4 },
+        "uniq_arr": {
+          "type": "array",
+          "items": { "type": "integer" },
+          "minItems": 2,
+          "maxItems": 4,
+          "uniqueItems": true
+        },
         "i_arr":  { "type": "array", "items": { "type": "integer" }, "minItems": 1, "maxItems": 4 },
         "b":      { "type": "boolean", "default": false },
         "b_arr":  { "type": "array", "items": { "type": "boolean" }, "minItems": 1, "maxItems": 2 },

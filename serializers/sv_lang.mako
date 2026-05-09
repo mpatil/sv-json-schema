@@ -150,8 +150,12 @@ class config_m extends uvm_object;
             if xi or ni:
                 con_s.append(f"constraint {n}_size_c {{ {ni}{xi}}};")
 
-            if mem['minimum'] or mem['maximum']:
-                con_s.append(f"constraint {n}_minmax_c {{ {mem['minimum']} {mem['maximum']}}};")
+            if mem['rangeConstraints']:
+                con_s.append(
+                    f"constraint {n}_range_c {{ {'; '.join(mem['rangeConstraints'])}; }};"
+                )
+            if mem.get('uniqueItems'):
+                con_s.append(f"constraint {n}_unique_c {{ unique {{ m_{n} }}; }};")
         else:
             if mem['type_cat'] == "string":
                 prnt_s.append(f"""\
@@ -190,8 +194,10 @@ class config_m extends uvm_object;
             else:
                 mem_s.append(f"{m};")
 
-            if mem['minimum'] or mem['maximum']:
-                con_s.append(f"constraint {n}_minmax_c {{ {mem['minimum']} {mem['maximum']}}};")
+            if mem['rangeConstraints']:
+                con_s.append(
+                    f"constraint {n}_range_c {{ {'; '.join(mem['rangeConstraints'])}; }};"
+                )
 
     mems   = '\n        '.join(mem_s)
     cons   = '\n        '.join(con_s)
