@@ -216,6 +216,7 @@ def _serialize_classes(
         cs[owner] = {
             "members": ms,
             "extends": branch_to_base.get(owner, "uvm_object"),
+            "strict": getattr(o, "additionalProperties", True) is False,
         }
     return cs
 

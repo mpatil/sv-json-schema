@@ -39,6 +39,15 @@ def with_oneof_params(fixtures_dir):
     return serialize_sv(parse(raw), widths, oneofs, oneof_props)
 
 
+@pytest.fixture(scope="module")
+def with_strict_params(fixtures_dir):
+    raw = materialize(
+        RefDict.from_uri(f"{fixtures_dir / 'with_strict.json'}#/"),
+        context_labeller=title_labeller(),
+    )
+    return serialize_sv(parse(raw))
+
+
 def _props_by_name(class_dict):
     """Index a class entry's member list by property name."""
     return {p["name"]: p for p in class_dict["members"]}
@@ -168,3 +177,11 @@ class TestOneOfSection:
     def test_anymap_not_in_classes(self, with_oneof_params):
         # Base classes live in `oneOfs`; only concrete classes go in `classes`.
         assert "AnyMap" not in with_oneof_params["classes"]
+
+
+class TestStrictSection:
+    def test_strict_class_marked(self, with_strict_params):
+        assert with_strict_params["classes"]["Strict"]["strict"] is True
+
+    def test_loose_class_not_marked(self, with_strict_params):
+        assert with_strict_params["classes"]["Loose"]["strict"] is False

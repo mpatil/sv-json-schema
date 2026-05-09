@@ -114,20 +114,6 @@ def _generate(repo_root, schema, class_out, tb_out, data_dir):
     )
 
 
-def _build_oneof_workspace(repo_root, fixtures_dir, tmp_path, data_dir):
-    """Generate SV in tmp_path and bring in runtime deps via symlinks."""
-    _generate(
-        repo_root=repo_root,
-        schema=fixtures_dir / "with_oneof.json",
-        class_out=tmp_path / "config_m.sv",
-        tb_out=tmp_path / "testbench.sv",
-        data_dir=data_dir,
-    )
-    for name in ("sv-embed-json", "serializers", "sv_tb.f"):
-        (tmp_path / name).symlink_to(repo_root / name)
-    return tmp_path
-
-
 def _vcs_compile_and_run(workspace):
     subprocess.run(
         [
@@ -157,6 +143,20 @@ def _vcs_compile_and_run(workspace):
     )
 
 
+def _build_workspace(repo_root, fixtures_dir, schema_name, tmp_path, data_dir):
+    """Generate SV from a fixture into tmp_path with runtime deps symlinked in."""
+    _generate(
+        repo_root=repo_root,
+        schema=fixtures_dir / schema_name,
+        class_out=tmp_path / "config_m.sv",
+        tb_out=tmp_path / "testbench.sv",
+        data_dir=data_dir,
+    )
+    for name in ("sv-embed-json", "serializers", "sv_tb.f"):
+        (tmp_path / name).symlink_to(repo_root / name)
+    return tmp_path
+
+
 def test_oneof_roundtrip_dispatches_by_discriminator(
     simulator, repo_root, fixtures_dir, tmp_path
 ):
@@ -165,7 +165,9 @@ def test_oneof_roundtrip_dispatches_by_discriminator(
         pytest.skip("oneOf e2e currently requires vcs")
 
     data_dir = fixtures_dir / "data"
-    workspace = _build_oneof_workspace(repo_root, fixtures_dir, tmp_path, data_dir)
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_oneof.json", tmp_path, data_dir
+    )
     _vcs_compile_and_run(workspace)
 
     cfg0 = json.loads((workspace / "Cfg0.json").read_text(encoding="utf8"))
@@ -181,6 +183,46 @@ def test_oneof_roundtrip_dispatches_by_discriminator(
     assert cfg1["name"] == "as_reg"
     assert cfg1["map"]["kind"] == "reg"
     assert cfg1["map"]["offset"] == 17
+
+
+def test_strict_clean_input_passes(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """A Strict-class input that contains exactly the declared keys should not error."""
+    if simulator != "vcs":
+        pytest.skip("strict e2e currently requires vcs")
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_strict.json", tmp_path, fixtures_dir / "data"
+    )
+    sim = _vcs_compile_and_run(workspace)
+    combined = sim.stdout + sim.stderr
+    assert "additionalProperties: false" not in combined, (
+        f"unexpected additionalProperties uvm_error on clean input:\n{combined}"
+    )
+
+
+def test_strict_extra_key_emits_uvm_error(
+    simulator, repo_root, fixtures_dir, tmp_path
+):
+    """An extra key not in the schema must fire the additionalProperties guard."""
+    if simulator != "vcs":
+        pytest.skip("strict e2e currently requires vcs")
+    rogue = tmp_path / "rogue_data"
+    rogue.mkdir()
+    (rogue / "Strict.json").write_text(
+        json.dumps([{"a": 1, "b": "ok", "rogue_extra": 99}], indent=2)
+    )
+    (rogue / "Loose.json").write_text(
+        (fixtures_dir / "data" / "Loose.json").read_text(encoding="utf8")
+    )
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_strict.json", tmp_path / "ws", rogue
+    )
+    sim = _vcs_compile_and_run(workspace)
+    combined = sim.stdout + sim.stderr
+    assert "unexpected property 'rogue_extra'" in combined, (
+        f"expected additionalProperties uvm_error not in sim output:\n{combined}"
+    )
 
 
 def test_oneof_unknown_discriminator_emits_uvm_error(
@@ -207,8 +249,8 @@ def test_oneof_unknown_discriminator_emits_uvm_error(
         (fixtures_dir / "data" / "RegMap.json").read_text(encoding="utf8")
     )
 
-    workspace = _build_oneof_workspace(
-        repo_root, fixtures_dir, tmp_path / "ws", rogue_data_dir
+    workspace = _build_workspace(
+        repo_root, fixtures_dir, "with_oneof.json", tmp_path / "ws", rogue_data_dir
     )
     sim = _vcs_compile_and_run(workspace)
     assert "unknown kind: rocket" in (sim.stdout + sim.stderr), (

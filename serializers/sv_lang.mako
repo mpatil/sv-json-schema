@@ -199,6 +199,23 @@ class config_m extends uvm_object;
                     f"constraint {n}_range_c {{ {'; '.join(mem['rangeConstraints'])}; }};"
                 )
 
+    if cls.get('strict'):
+        allowed_names = ", ".join(f'"{m["name"]}"' for m in cls['members'])
+        fjson_s.append(f"""\
+begin
+                ObjectVal_ _obj_jv;
+                string _allowed[] = {{ {allowed_names} }};
+                if ($cast(_obj_jv, jv)) begin
+                    for (int _i = 0; _i < _obj_jv.size(); _i++) begin
+                        string _k = _obj_jv.keyAt(_i);
+                        bit _ok = 0;
+                        foreach (_allowed[_a]) if (_k == _allowed[_a]) _ok = 1;
+                        if (!_ok)
+                            `uvm_error(get_full_name(), $sformatf("unexpected property '%s' (additionalProperties: false)", _k))
+                    end
+                end
+            end""")
+
     mems   = '\n        '.join(mem_s)
     cons   = '\n        '.join(con_s)
     prands = '\n'.join(prand_s)

@@ -9,7 +9,7 @@ branch.
 | 1 | `required` field enforcement (uvm_error on missing key)     | M      | done   |
 | 2 | Plain `enum` on string / integer                            | M      | open   |
 | 3 | `oneOf` composition (discriminator-based, top-level only)   | L      | done   |
-| 4 | `additionalProperties: false` (warn/error on unknown keys)  | S      | open   |
+| 4 | `additionalProperties: false` (uvm_error on unknown keys)   | S      | done   |
 | 5 | `exclusiveMinimum`, `exclusiveMaximum`, `multipleOf`        | XS     | done   |
 | 6 | `pattern` (regex) — open / `uniqueItems` — done             | M / S  | partial |
 | 7 | Recursive `$ref` (forward declarations + cycle handling)    | M      | open   |
