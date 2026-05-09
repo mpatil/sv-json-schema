@@ -37,16 +37,16 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("tag") == null) `uvm_error(get_full_name(), "required field \"tag\" missing from input")
-            `from_json_string(tag)
-            `from_json_int(n)
+            `from_json_string(m_tag, tag)
+            `from_json_int(m_n, n)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_string(tag)
-            `to_json_int(n)
+            `to_json_string(m_tag, tag)
+            `to_json_int(m_n, n)
             return jv;
         endfunction : toJSON
 `endif
@@ -114,50 +114,50 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("i") == null) `uvm_error(get_full_name(), "required field \"i\" missing from input")
-            `from_json_int(i)
-            `from_json_int(i64)
-            `from_json_int_array(i64_arr)
-            `from_json_int(i_excl)
-            `from_json_int(i_mult)
-            `from_json_int_array(uniq_arr)
-            `from_json_int_array(i_arr)
-            `from_json_bool(b)
-            `from_json_bool_array(b_arr)
-            `from_json_string(s)
-            `from_json_string_array(s_arr)
+            `from_json_int(m_i, i)
+            `from_json_int(m_i64, i64)
+            `from_json_int_array(m_i64_arr, i64_arr)
+            `from_json_int(m_i_excl, i_excl)
+            `from_json_int(m_i_mult, i_mult)
+            `from_json_int_array(m_uniq_arr, uniq_arr)
+            `from_json_int_array(m_i_arr, i_arr)
+            `from_json_bool(m_b, b)
+            `from_json_bool_array(m_b_arr, b_arr)
+            `from_json_string(m_s, s)
+            `from_json_string_array(m_s_arr, s_arr)
             if (jv.getByKey("h") == null) `uvm_error(get_full_name(), "required field \"h\" missing from input")
-            `from_json_hex(h)
-            `from_json_hex_array(h_arr)
-            `from_json_binary(bn)
-            `from_json_binary_array(bn_arr)
-            `from_json_enum(e, Mode)
+            `from_json_hex(m_h, h)
+            `from_json_hex_array(m_h_arr, h_arr)
+            `from_json_binary(m_bn, bn)
+            `from_json_binary_array(m_bn_arr, bn_arr)
+            `from_json_enum(m_e, e, Mode)
             if (jv.getByKey("obj") == null) `uvm_error(get_full_name(), "required field \"obj\" missing from input")
-            `from_json_object(obj)
-            `from_json_object_array(obj_arr)
+            `from_json_object(m_obj, obj)
+            `from_json_object_array(m_obj_arr, obj_arr)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(i)
-            `to_json_int(i64)
-            `to_json_int_array(i64_arr)
-            `to_json_int(i_excl)
-            `to_json_int(i_mult)
-            `to_json_int_array(uniq_arr)
-            `to_json_int_array(i_arr)
-            `to_json_bool(b)
-            `to_json_bool_array(b_arr)
-            `to_json_string(s)
-            `to_json_string_array(s_arr)
-            `to_json_hex(h)
-            `to_json_hex_array(h_arr)
-            `to_json_binary(bn)
-            `to_json_binary_array(bn_arr)
-            `to_json_enum(e)
-            `to_json_object(obj)
-            `to_json_object_array(obj_arr)
+            `to_json_int(m_i, i)
+            `to_json_int(m_i64, i64)
+            `to_json_int_array(m_i64_arr, i64_arr)
+            `to_json_int(m_i_excl, i_excl)
+            `to_json_int(m_i_mult, i_mult)
+            `to_json_int_array(m_uniq_arr, uniq_arr)
+            `to_json_int_array(m_i_arr, i_arr)
+            `to_json_bool(m_b, b)
+            `to_json_bool_array(m_b_arr, b_arr)
+            `to_json_string(m_s, s)
+            `to_json_string_array(m_s_arr, s_arr)
+            `to_json_hex(m_h, h)
+            `to_json_hex_array(m_h_arr, h_arr)
+            `to_json_binary(m_bn, bn)
+            `to_json_binary_array(m_bn_arr, bn_arr)
+            `to_json_enum(m_e, e)
+            `to_json_object(m_obj, obj)
+            `to_json_object_array(m_obj_arr, obj_arr)
             return jv;
         endfunction : toJSON
 `endif

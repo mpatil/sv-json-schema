@@ -32,16 +32,16 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("id") == null) `uvm_error(get_full_name(), "required field \"id\" missing from input")
-            `from_json_int(id)
-            `from_json_string(name)
+            `from_json_int(m_id, id)
+            `from_json_string(m_name, name)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(id)
-            `to_json_string(name)
+            `to_json_int(m_id, id)
+            `to_json_string(m_name, name)
             return jv;
         endfunction : toJSON
 `endif
@@ -79,19 +79,19 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("awuser") == null) `uvm_error(get_full_name(), "required field \"awuser\" missing from input")
-            `from_json_int(awuser)
+            `from_json_int(m_awuser, awuser)
             if (jv.getByKey("id") == null) `uvm_error(get_full_name(), "required field \"id\" missing from input")
-            `from_json_int(id)
-            `from_json_string(name)
+            `from_json_int(m_id, id)
+            `from_json_string(m_name, name)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(awuser)
-            `to_json_int(id)
-            `to_json_string(name)
+            `to_json_int(m_awuser, awuser)
+            `to_json_int(m_id, id)
+            `to_json_string(m_name, name)
             return jv;
         endfunction : toJSON
 `endif

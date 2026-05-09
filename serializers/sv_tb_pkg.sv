@@ -3,7 +3,7 @@
 
 package sv_tb_pkg;
 `include "uvm_macros.svh"
-`include "sv_json_macros.svh"
+`include "json_macros.svh"
 
   import uvm_pkg::*;
 
@@ -16,28 +16,12 @@ package sv_tb_pkg;
   import json_pkg::StringVal_;
   import json_pkg::BoolVal_;
   import json_pkg::NullVal_;
+  import json_pkg::mkInt;
+  import json_pkg::mkReal;
+  import json_pkg::mkStr;
+  import json_pkg::mkBool;
   import json_pkg::pJSON;
   import json_pkg::psJSON;
-
-  function automatic Val_ _mkInt(longint x);
-    IntVal_ v = new(x);
-    return v;
-  endfunction
-
-  function automatic Val_ _mkReal(real x);
-    RealVal_ v = new(x);
-    return v;
-  endfunction
-
-  function automatic Val_ _mkStr(string x);
-    StringVal_ v = new(x);
-    return v;
-  endfunction
-
-  function automatic Val_ _mkBool(bit x);
-    BoolVal_ v = new(x);
-    return v;
-  endfunction
 `endif
 
 `include "config_m.sv"

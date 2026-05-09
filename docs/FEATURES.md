@@ -483,6 +483,30 @@ failure, not a runtime surprise.
 
 ---
 
+## SV runtime layering
+
+The generated SV depends on three pieces of [sv-embed-json](https://github.com/mpatil/sv-embed-json):
+
+* `json/json_pkg.sv` (the package) — `Val_` value tree, `pJSON` /
+  `psJSON` parsers, `mkInt` / `mkReal` / `mkStr` / `mkBool`
+  Val_-construction helpers.
+* `json/uvm/json_macros.svh` — UVM-aware reader / writer macros over
+  `Val_`, with the calling convention
+  `\`from_json_<kind>(FIELD, KEY[, EXTRA])` /
+  `\`to_json_<kind>(FIELD, KEY[, EXTRA])`. The generator emits exactly
+  those calls; the macros handle null-checks, key lookup, type tags,
+  and cardinality.
+* The non-UVM `Val_` core stays UVM-free; `json_macros.svh` is the
+  optional UVM layer.
+
+`sv_tb.f` puts both
+`+incdir+sv-embed-json/src/json` and `+incdir+sv-embed-json/src/json/uvm`
+on the include path; `serializers/sv_tb_pkg.sv` does
+`\`include "json_macros.svh"` so the macros are in scope when
+`config_m.sv` is compiled.
+
+---
+
 ## Generated UVM artifacts per class
 
 Every generated class:

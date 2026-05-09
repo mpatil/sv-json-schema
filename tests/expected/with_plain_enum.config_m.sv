@@ -48,12 +48,12 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("color") == null) `uvm_error(get_full_name(), "required field \"color\" missing from input")
-            `from_json_enum(color, Cfg_color_e)
+            `from_json_enum(m_color, color, Cfg_color_e)
             if (jv.getByKey("level") == null) `uvm_error(get_full_name(), "required field \"level\" missing from input")
-            `from_json_int(level)
+            `from_json_int(m_level, level)
             if (! (m_level inside { 0, 1, 5 })) `uvm_error(get_full_name(), $sformatf("'level' value %0d not in enum", m_level))
-            `from_json_enum_array(tags, Cfg_tags_e)
-            `from_json_int_array(vals)
+            `from_json_enum_array(m_tags, tags, Cfg_tags_e)
+            `from_json_int_array(m_vals, vals)
             foreach (m_vals[_i]) if (! (m_vals[_i] inside { 1, 2, 3 })) `uvm_error(get_full_name(), $sformatf("'vals' element %0d not in enum", m_vals[_i]))
         endfunction : fromJSON
 `endif
@@ -61,10 +61,10 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_enum(color)
-            `to_json_int(level)
-            `to_json_enum_array(tags)
-            `to_json_int_array(vals)
+            `to_json_enum(m_color, color)
+            `to_json_int(m_level, level)
+            `to_json_enum_array(m_tags, tags)
+            `to_json_int_array(m_vals, vals)
             return jv;
         endfunction : toJSON
 `endif

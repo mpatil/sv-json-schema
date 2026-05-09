@@ -69,19 +69,19 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("kind") == null) `uvm_error(get_full_name(), "required field \"kind\" missing from input")
-            `from_json_string(kind)
+            `from_json_string(m_kind, kind)
             if (jv.getByKey("size") == null) `uvm_error(get_full_name(), "required field \"size\" missing from input")
-            `from_json_int(size)
-            `from_json_hex(region)
+            `from_json_int(m_size, size)
+            `from_json_hex(m_region, region)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_string(kind)
-            `to_json_int(size)
-            `to_json_hex(region)
+            `to_json_string(m_kind, kind)
+            `to_json_int(m_size, size)
+            `to_json_hex(m_region, region)
             return jv;
         endfunction : toJSON
 `endif
@@ -119,17 +119,17 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("kind") == null) `uvm_error(get_full_name(), "required field \"kind\" missing from input")
-            `from_json_string(kind)
+            `from_json_string(m_kind, kind)
             if (jv.getByKey("offset") == null) `uvm_error(get_full_name(), "required field \"offset\" missing from input")
-            `from_json_int(offset)
+            `from_json_int(m_offset, offset)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_string(kind)
-            `to_json_int(offset)
+            `to_json_string(m_kind, kind)
+            `to_json_int(m_offset, offset)
             return jv;
         endfunction : toJSON
 `endif
@@ -165,17 +165,17 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_string(name)
+            `from_json_string(m_name, name)
             if (jv.getByKey("map") == null) `uvm_error(get_full_name(), "required field \"map\" missing from input")
-            `from_json_oneof(map, AnyMap)
+            `from_json_oneof(m_map, map, AnyMap)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_string(name)
-            `to_json_oneof(map)
+            `to_json_string(m_name, name)
+            `to_json_oneof(m_map, map)
             return jv;
         endfunction : toJSON
 `endif

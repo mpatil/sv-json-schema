@@ -89,16 +89,16 @@ class config_m extends uvm_object;
                 f'`uvm_error(get_full_name(), "required field \\"{n}\\" missing from input")'
             )
         if mem['type_cat'] == 'enum_int':
-            fjson_s.append(f"`from_json_int({n})")
-            tjson_s.append(f"`to_json_int({n})")
+            fjson_s.append(f"`from_json_int(m_{n}, {n})")
+            tjson_s.append(f"`to_json_int(m_{n}, {n})")
             vals = ', '.join(str(v) for v in mem['enumIntValues'])
             fjson_s.append(
                 f'if (! (m_{n} inside {{ {vals} }})) '
                 f'`uvm_error(get_full_name(), $sformatf("\'{n}\' value %0d not in enum", m_{n}))'
             )
         elif mem['type_cat'] == 'enum_int_array':
-            fjson_s.append(f"`from_json_int_array({n})")
-            tjson_s.append(f"`to_json_int_array({n})")
+            fjson_s.append(f"`from_json_int_array(m_{n}, {n})")
+            tjson_s.append(f"`to_json_int_array(m_{n}, {n})")
             vals = ', '.join(str(v) for v in mem['enumIntValues'])
             fjson_s.append(
                 f"foreach (m_{n}[_i]) "
@@ -106,8 +106,8 @@ class config_m extends uvm_object;
                 f'`uvm_error(get_full_name(), $sformatf("\'{n}\' element %0d not in enum", m_{n}[_i]))'
             )
         else:
-            fjson_s.append(f"`from_json_{mem['type_cat']}({n}{e})")
-            tjson_s.append(f"`to_json_{mem['type_cat']}({n})")
+            fjson_s.append(f"`from_json_{mem['type_cat']}(m_{n}, {n}{e})")
+            tjson_s.append(f"`to_json_{mem['type_cat']}(m_{n}, {n})")
 
         for check in mem.get('validationChecks', ()):
             fjson_s.append(check)

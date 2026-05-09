@@ -32,12 +32,12 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_string(name)
+            `from_json_string(m_name, name)
             if (m_name.len() < 3) `uvm_error(get_full_name(), $sformatf("'name' length %0d below minLength 3", m_name.len()))
             if (m_name.len() > 8) `uvm_error(get_full_name(), $sformatf("'name' length %0d above maxLength 8", m_name.len()))
-            `from_json_string(tag)
+            `from_json_string(m_tag, tag)
             if (m_tag != "v1") `uvm_error(get_full_name(), $sformatf("'tag' must equal const %s, got '%s'", "v1", m_tag))
-            `from_json_int(version)
+            `from_json_int(m_version, version)
             if (m_version != 1) `uvm_error(get_full_name(), $sformatf("'version' must equal const 1, got %0d", m_version))
         endfunction : fromJSON
 `endif
@@ -45,9 +45,9 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_string(name)
-            `to_json_string(tag)
-            `to_json_int(version)
+            `to_json_string(m_name, name)
+            `to_json_string(m_tag, tag)
+            `to_json_int(m_version, version)
             return jv;
         endfunction : toJSON
 `endif

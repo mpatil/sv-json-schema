@@ -59,30 +59,30 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_enum(kind, AddrMapKind)
-            `from_json_string(name)
-            `from_json_int(id)
-            `from_json_enum(domain, AddrMapMem)
-            `from_json_hex(region)
+            `from_json_enum(m_kind, kind, AddrMapKind)
+            `from_json_string(m_name, name)
+            `from_json_int(m_id, id)
+            `from_json_enum(m_domain, domain, AddrMapMem)
+            `from_json_hex(m_region, region)
             if (jv.getByKey("addr") == null) `uvm_error(get_full_name(), "required field \"addr\" missing from input")
-            `from_json_hex(addr)
+            `from_json_hex(m_addr, addr)
             if (jv.getByKey("size") == null) `uvm_error(get_full_name(), "required field \"size\" missing from input")
-            `from_json_int(size)
-            `from_json_binary(mode)
+            `from_json_int(m_size, size)
+            `from_json_binary(m_mode, mode)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_enum(kind)
-            `to_json_string(name)
-            `to_json_int(id)
-            `to_json_enum(domain)
-            `to_json_hex(region)
-            `to_json_hex(addr)
-            `to_json_int(size)
-            `to_json_binary(mode)
+            `to_json_enum(m_kind, kind)
+            `to_json_string(m_name, name)
+            `to_json_int(m_id, id)
+            `to_json_enum(m_domain, domain)
+            `to_json_hex(m_region, region)
+            `to_json_hex(m_addr, addr)
+            `to_json_int(m_size, size)
+            `to_json_binary(m_mode, mode)
             return jv;
         endfunction : toJSON
 `endif
@@ -128,22 +128,22 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_bool(is_active)
-            `from_json_bool(en_ext_clock)
-            `from_json_string(txn_log_filelname)
-            `from_json_object(addr_map)
-            `from_json_int(awuser_width)
+            `from_json_bool(m_is_active, is_active)
+            `from_json_bool(m_en_ext_clock, en_ext_clock)
+            `from_json_string(m_txn_log_filelname, txn_log_filelname)
+            `from_json_object(m_addr_map, addr_map)
+            `from_json_int(m_awuser_width, awuser_width)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_bool(is_active)
-            `to_json_bool(en_ext_clock)
-            `to_json_string(txn_log_filelname)
-            `to_json_object(addr_map)
-            `to_json_int(awuser_width)
+            `to_json_bool(m_is_active, is_active)
+            `to_json_bool(m_en_ext_clock, en_ext_clock)
+            `to_json_string(m_txn_log_filelname, txn_log_filelname)
+            `to_json_object(m_addr_map, addr_map)
+            `to_json_int(m_awuser_width, awuser_width)
             return jv;
         endfunction : toJSON
 `endif
@@ -184,14 +184,14 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_object_array(cfg)
+            `from_json_object_array(m_cfg, cfg)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_object_array(cfg)
+            `to_json_object_array(m_cfg, cfg)
             return jv;
         endfunction : toJSON
 `endif
@@ -230,14 +230,14 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_object_array(cfg)
+            `from_json_object_array(m_cfg, cfg)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_object_array(cfg)
+            `to_json_object_array(m_cfg, cfg)
             return jv;
         endfunction : toJSON
 `endif

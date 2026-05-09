@@ -31,8 +31,8 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("a") == null) `uvm_error(get_full_name(), "required field \"a\" missing from input")
-            `from_json_int(a)
-            `from_json_string(b)
+            `from_json_int(m_a, a)
+            `from_json_string(m_b, b)
             begin
                 ObjectVal_ _obj_jv;
                 string _allowed[] = { "a", "b" };
@@ -52,8 +52,8 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(a)
-            `to_json_string(b)
+            `to_json_int(m_a, a)
+            `to_json_string(m_b, b)
             return jv;
         endfunction : toJSON
 `endif
@@ -88,14 +88,14 @@ class config_m extends uvm_object;
 
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
-            `from_json_int(x)
+            `from_json_int(m_x, x)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(x)
+            `to_json_int(m_x, x)
             return jv;
         endfunction : toJSON
 `endif

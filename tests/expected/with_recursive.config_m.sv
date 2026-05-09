@@ -31,16 +31,16 @@ class config_m extends uvm_object;
 `ifdef JSON_PKG
         virtual function void fromJSON(Val_ jv);
             if (jv.getByKey("value") == null) `uvm_error(get_full_name(), "required field \"value\" missing from input")
-            `from_json_int(value)
-            `from_json_object_array(children)
+            `from_json_int(m_value, value)
+            `from_json_object_array(m_children, children)
         endfunction : fromJSON
 `endif
 
 `ifdef JSON_PKG
         virtual function ObjectVal_ toJSON();
             ObjectVal_ jv = new();
-            `to_json_int(value)
-            `to_json_object_array(children)
+            `to_json_int(m_value, value)
+            `to_json_object_array(m_children, children)
             return jv;
         endfunction : toJSON
 `endif
