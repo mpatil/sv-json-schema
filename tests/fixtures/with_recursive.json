@@ -1,0 +1,19 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "WithRecursive",
+  "description": "Self-referential schema: a Tree containing arrays of Trees.",
+  "definitions": {
+    "Tree": {
+      "type": "object",
+      "description": "Recursive node carrying an integer value plus children.",
+      "properties": {
+        "value":    { "type": "integer", "default": 0 },
+        "children": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/Tree" }
+        }
+      },
+      "required": ["value"]
+    }
+  }
+}

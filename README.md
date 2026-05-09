@@ -67,10 +67,11 @@ output examples and the test fixture that exercises it.
 | `additionalProperties: false`                             | done |
 | `oneOf` (top-level definition, with `discriminator`)      | done |
 | `allOf` (object property-merging from referenced bases)   | done |
+| Recursive `$ref` (self-referential schemas)               | done |
 | `$ref` (intra-document and external file)                 | done |
 | `description` propagated to SV `//` comments              | done |
 | `--strict` diagnostics for unsupported standard keywords  | done |
-| recursive `$ref`, `null`, multi-type union, `pattern`     | not yet — see `TODO.md` |
+| `null`, multi-type union, `pattern`                       | not yet — see `TODO.md` |
 
 ## References
 

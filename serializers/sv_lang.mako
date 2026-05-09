@@ -148,7 +148,8 @@ class config_m extends uvm_object;
                 printer.print_field_int("{n}", m_{n}[i], {mem['width']}, UVM_BIN);
             end""")
             elif mem['type_cat'] == "object_array":
-                prand_s.append(f"""\
+                if not mem.get('isRecursiveRef'):
+                    prand_s.append(f"""\
             foreach (m_{n}[i]) begin
                 m_{n}[i] = new($sformatf("{n}[%0d]", i));
                 void'(m_{n}[i].randomize());
@@ -208,7 +209,8 @@ class config_m extends uvm_object;
                 prnt_s.append(f"""\
             printer.print_field_int("{n}", m_{n}, {mem['width']}, UVM_BIN);""")
             elif mem['type_cat'] == "object":
-                prand_s.append(f"""\
+                if not mem.get('isRecursiveRef'):
+                    prand_s.append(f"""\
             m_{n} = new("{n}");
             void'(m_{n}.randomize());""")
                 prnt_s.append(f"""\

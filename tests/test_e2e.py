@@ -364,6 +364,38 @@ def test_allof_merged_properties_roundtrip(
         )
 
 
+def test_recursive_tree_roundtrip(simulator, repo_root, fixtures_dir, tmp_path):
+    """A self-referential schema must round-trip a multi-level tree."""
+    if simulator != "vcs":
+        pytest.skip("recursive e2e currently requires vcs")
+    workspace = _build_workspace(
+        repo_root,
+        fixtures_dir,
+        "with_recursive.json",
+        tmp_path,
+        fixtures_dir / "data_recursive",
+    )
+    _vcs_compile_and_run(workspace)
+    out = json.loads((workspace / "Tree0.json").read_text(encoding="utf8"))
+    inp = json.loads(
+        (fixtures_dir / "data_recursive" / "Tree.json").read_text(encoding="utf8")
+    )[0]
+
+    # Root.
+    assert out["value"] == inp["value"] == 1
+    assert len(out["children"]) == 2
+    # First child has its own grandchild (depth 2 of recursion).
+    c0 = out["children"][0]
+    assert c0["value"] == 2
+    assert len(c0["children"]) == 1
+    assert c0["children"][0]["value"] == 4
+    assert c0["children"][0]["children"] == []
+    # Second child is a leaf.
+    c1 = out["children"][1]
+    assert c1["value"] == 3
+    assert c1["children"] == []
+
+
 def test_int64_roundtrip(simulator, repo_root, fixtures_dir, tmp_path):
     """An integer with format=int64 must round-trip values beyond 2^31."""
     if simulator != "vcs":

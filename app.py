@@ -26,6 +26,10 @@ from serializers.composition import apply_allof_merging  # noqa: E402
 from serializers.diagnostics import collect_diagnostics  # noqa: E402
 from serializers.intformat import collect_int_formats  # noqa: E402
 from serializers.oneof import collect_oneof_props, collect_oneofs  # noqa: E402
+from serializers.recursive import (  # noqa: E402
+    break_recursive_cycles,
+    collect_recursive_refs,
+)
 from serializers.sv_lang import serialize_sv  # noqa: E402
 
 
@@ -114,6 +118,7 @@ def _resolve_schema(input_uri: str, *, strict: bool):
         RefDict.from_uri(input_uri), context_labeller=title_labeller()
     )
     apply_allof_merging(raw)
+    break_recursive_cycles(raw)
     diagnostics = collect_diagnostics(raw)
     for d in diagnostics:
         sys.stderr.write(f"{'error' if strict else 'warning'}: {d.format()}\n")
@@ -126,7 +131,8 @@ def _resolve_schema(input_uri: str, *, strict: bool):
     oneofs = collect_oneofs(raw)
     oneof_props = collect_oneof_props(raw)
     int_formats = collect_int_formats(raw)
-    return parse(raw), widths, oneofs, oneof_props, int_formats
+    recursive_refs = collect_recursive_refs(raw)
+    return parse(raw), widths, oneofs, oneof_props, int_formats, recursive_refs
 
 
 def _render(template_path: Path, params: dict) -> str:
@@ -154,10 +160,12 @@ def main(argv: Iterable[str] = None) -> int:
     register_format_validators()
     args = _parse_args(sys.argv[1:] if argv is None else argv)
 
-    elements, widths, oneofs, oneof_props, int_formats = _resolve_schema(
-        parse_input_arg(args.input), strict=args.strict
+    (
+        elements, widths, oneofs, oneof_props, int_formats, recursive_refs
+    ) = _resolve_schema(parse_input_arg(args.input), strict=args.strict)
+    params = serialize_sv(
+        elements, widths, oneofs, oneof_props, int_formats, recursive_refs
     )
-    params = serialize_sv(elements, widths, oneofs, oneof_props, int_formats)
     params["data_dir"] = args.tb_data_dir.rstrip("/")
 
     if args.template is not None:

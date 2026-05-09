@@ -24,6 +24,7 @@ from statham.serializers.orderer import orderer
 from serializers.bitvec import BitVec, RADIX_BINARY, RADIX_HEX, WidthMap
 from serializers.intformat import IntFormatMap
 from serializers.oneof import OneOfMap, OneOfPropMap
+from serializers.recursive import RecursiveRefMap, is_stub_class_name
 
 
 T = TypeVar("T")
@@ -300,6 +301,7 @@ def _serialize_classes(
     oneof_props: OneOfPropMap,
     string_enums: Dict[str, List[str]],
     int_formats: IntFormatMap,
+    recursive_refs: RecursiveRefMap,
 ) -> Dict[str, Dict[str, Any]]:
     branch_to_base = _branch_to_base(oneofs)
     cs: Dict[str, Dict[str, Any]] = {}
@@ -307,6 +309,12 @@ def _serialize_classes(
         if not isinstance(o.enum, NotPassed):
             continue
         owner = str(o)
+        if is_stub_class_name(owner):
+            # Synthetic class introduced by `serializers.recursive` to break a
+            # statham parse cycle. Its only job was to give statham a typed
+            # placeholder; the real type is the recursive target, which is
+            # already in `recursive_refs`.
+            continue
         ms: List[Dict[str, Any]] = []
         for p in o.properties:
             elem = o._properties[p].element
@@ -315,11 +323,18 @@ def _serialize_classes(
             int_fmt = int_formats.get((owner, p))
             ty, is_rand = sv_type(elem, bv, pe, int_fmt)
             base = oneof_props.get((owner, p))
+            recursive_target = recursive_refs.get((owner, p))
             if base is not None:
                 # Override inferred type/category with the oneOf base class.
                 ty = base
                 is_rand = False  # oneOf-typed fields aren't safe to randomize
                 cat = "oneof_array" if isinstance(elem, Array) else "oneof"
+            elif recursive_target is not None:
+                # Self-referential field — don't randomize (would infinite-loop)
+                # and don't auto-instantiate in post_randomize.
+                ty = recursive_target
+                is_rand = False
+                cat = "object_array" if isinstance(elem, Array) else "object"
             else:
                 cat = json_type(elem, bv, pe)
             if pe is not None and pe.kind == "str":
@@ -340,6 +355,7 @@ def _serialize_classes(
                 "validationChecks": _validation_checks(p, elem),
                 "bits": integer_bits(int_fmt),
                 "description": _attr(elem, "description"),
+                "isRecursiveRef": recursive_target is not None,
             }
             prop.update(
                 _array_constraints(p, elem)
@@ -375,14 +391,17 @@ def serialize_sv(
     oneofs: Optional[OneOfMap] = None,
     oneof_props: Optional[OneOfPropMap] = None,
     int_formats: Optional[IntFormatMap] = None,
+    recursive_refs: Optional[RecursiveRefMap] = None,
 ) -> Dict[str, Any]:
     widths = widths or {}
     oneofs = oneofs or {}
     oneof_props = oneof_props or {}
     int_formats = int_formats or {}
+    recursive_refs = recursive_refs or {}
     string_enums: Dict[str, List[str]] = {}
     classes = _serialize_classes(
-        elements, widths, oneofs, oneof_props, string_enums, int_formats
+        elements, widths, oneofs, oneof_props, string_enums, int_formats,
+        recursive_refs,
     )
     enums = _serialize_enums(elements)
     enums.update(string_enums)

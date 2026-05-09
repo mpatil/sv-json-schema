@@ -173,6 +173,7 @@ def test_existing_fixtures_have_zero_diagnostics(repo_root, fixtures_dir):
     from statham.titles import title_labeller
 
     from serializers.composition import apply_allof_merging
+    from serializers.recursive import break_recursive_cycles
 
     schemas = [
         repo_root / "examples" / "axi4_cfg_schema.json",
@@ -183,12 +184,14 @@ def test_existing_fixtures_have_zero_diagnostics(repo_root, fixtures_dir):
         fixtures_dir / "with_plain_enum.json",
         fixtures_dir / "with_validation.json",
         fixtures_dir / "with_allof.json",
+        fixtures_dir / "with_recursive.json",
     ]
     for schema in schemas:
         raw = materialize(
             RefDict.from_uri(f"{schema}#/"), context_labeller=title_labeller()
         )
         apply_allof_merging(raw)
+        break_recursive_cycles(raw)
         diags = collect_diagnostics(raw)
         assert diags == [], (
             f"{schema.name} has diagnostics:\n"

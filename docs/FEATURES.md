@@ -345,6 +345,50 @@ Fixture: `examples/axi4_cfg_schema.json` (Cfg.addr_map → AddrMap).
 
 ---
 
+## Recursive `$ref` (self-referential types)
+
+statham raises `FeatureNotImplementedError` on cyclic schemas, so the
+generator preprocesses the materialized dict to break self-references.
+For each top-level definition, every alias-to-self inside it is replaced
+with a stub `{"type": "object", "x-sv-recursive-ref": <name>}`. statham
+parses the stub as an empty placeholder class which the SV serializer
+filters out of the rendered output; properties that pointed at the stub
+get re-typed as the original target class via a side-table.
+
+```json
+"definitions": {
+  "Tree": {
+    "type": "object",
+    "properties": {
+      "value":    { "type": "integer", "default": 0 },
+      "children": { "type": "array",   "items": { "$ref": "#/definitions/Tree" } }
+    }
+  }
+}
+```
+
+```sv
+class Tree extends uvm_object;
+    `uvm_object_utils(Tree)
+    rand int  m_value = 0;
+    Tree      m_children[];   // not `rand`, no auto-allocate in post_randomize
+
+    virtual function void fromJSON(Val_ jv);
+        `from_json_int(value)
+        `from_json_object_array(children)   // recurses: each child gets fromJSON
+    endfunction
+```
+
+Recursive fields are intentionally **not** randomized: an unbounded
+`rand` tree would loop in `randomize()`. Populate them explicitly or via
+`fromJSON`. v1 supports direct self-recursion (a class referencing itself
+through any depth of `properties`/`items`); mutual recursion (`A → B → A`)
+is still flagged by statham.
+
+Fixture: `tests/fixtures/with_recursive.json`.
+
+---
+
 ## `allOf` (object property merging)
 
 When a top-level definition uses `allOf` to mix in properties from another
