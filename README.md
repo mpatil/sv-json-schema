@@ -20,5 +20,6 @@ The json schema library used is statham-schema. The SystemVerilog serializer des
 1. Clone the repository: `git clone https://github.com/mpatil/sv-json-schema.git && cd sv-json-schema`
 1. Initialise git submodules: `git submodule update --init --recursive`
 1. Install the requirements: `pip install -r requirements.txt`
-1. Setup simulator env. Only mentor questa supported right now.
-1. Run the default generation: `make`
+1. Setup simulator env. Mentor Questa (`qrun`) and Synopsys VCS are supported.
+1. Run the default generation with Questa: `make`
+1. Or run with VCS: `make vcsrun`
