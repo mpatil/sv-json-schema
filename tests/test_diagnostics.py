@@ -8,7 +8,7 @@ import sys
 
 import pytest
 
-from serializers.diagnostics import collect_diagnostics
+from sv_json_schema.diagnostics import collect_diagnostics
 
 
 def _diags_for(node):
@@ -172,8 +172,8 @@ def test_existing_fixtures_have_zero_diagnostics(repo_root, fixtures_dir):
     from json_ref_dict import RefDict, materialize
     from statham.titles import title_labeller
 
-    from serializers.composition import apply_allof_merging
-    from serializers.recursive import break_recursive_cycles
+    from sv_json_schema.composition import apply_allof_merging
+    from sv_json_schema.recursive import break_recursive_cycles
 
     schemas = [
         repo_root / "examples" / "axi4_cfg_schema.json",

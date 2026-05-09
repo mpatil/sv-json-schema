@@ -29,7 +29,7 @@ schema.json  --(json_ref_dict)--> | resolved schema dict    |
                                                  +---------+---------+
                                                            |
                                                            v
-                                          serializers.sv_lang.serialize_sv
+                                          sv_json_schema.sv_lang.serialize_sv
                                                            |
                                                            v
                                                   +--------+--------+
@@ -79,17 +79,55 @@ output examples and the test fixture that exercises it.
 1. [sv-embed-json](https://github.com/mpatil/sv-embed-json) — SV runtime JSON parser
 1. [JSON Schema](https://json-schema.org/)
 
-## Development
+## Install
 
-1. Clone the repository: `git clone https://github.com/mpatil/sv-json-schema.git && cd sv-json-schema`
-1. Initialise git submodules: `git submodule update --init --recursive`
-1. Install the requirements: `pip install -r requirements.txt`
-1. Setup simulator env. Mentor Questa (`qrun`) and Synopsys VCS are supported.
-1. Run the default generation with Questa: `make`
-1. Or run with VCS: `make vcsrun`
+The Python generator is packaged at `src/sv_json_schema/`. The SV runtime
+that the generated code depends on lives in the
+[sv-embed-json](https://github.com/mpatil/sv-embed-json) submodule.
 
-The default `make` target generates against `examples/axi4_cfg_schema.json`;
-override the example with `make EXAMPLE=other_schema_basename`.
+```sh
+git clone https://github.com/mpatil/sv-json-schema.git
+cd sv-json-schema
+git submodule update --init --recursive            # pulls sv-embed-json
+pip install -e .[test]                             # editable install + pytest
+```
+
+That gives you the `sv-json-schema` console script and pulls
+`statham-schema`, `Mako`, and `json-ref-dict` from PyPI.
+
+## Use
+
+```sh
+# Generate a config class + testbench from a schema
+sv-json-schema --input examples/axi4_cfg_schema.json \
+               --class-out config_m.sv --tb-out testbench.sv \
+               --tb-data-dir examples/data
+
+# Locate the bundled SV runtime (sv_tb_pkg.sv + default templates)
+sv-json-schema --print-incdir
+```
+
+`--print-incdir` returns the directory the wheel installs to (or the
+in-tree `src/sv_json_schema/data/` for editable installs); add it to your
+simulator's `+incdir+` list so SV picks up `sv_tb_pkg.sv`.
+
+`--strict` turns warnings on unsupported standard JSON-Schema keywords
+into hard errors.
+
+## Build
+
+The default `make` target uses `app.py` (a thin shim that puts `src/`
+on `sys.path`) so a fresh clone runs without `pip install`:
+
+```sh
+make             # qrun (Mentor Questa)
+make vcsrun      # Synopsys VCS
+make EXAMPLE=types vcsrun      # alternate schema under examples/
+```
+
+After `pip install -e .` the same flow works via `sv-json-schema` directly;
+the Makefile's `SV_JSON_SCHEMA = python3 app.py` is just a default, swap
+for `sv-json-schema` if you prefer.
 
 ## Tests
 

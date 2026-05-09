@@ -8,7 +8,7 @@ import pytest
 from json_ref_dict import RefDict, materialize
 from statham.titles import title_labeller
 
-from serializers.bitvec import (
+from sv_json_schema.bitvec import (
     BitVec,
     DEFAULT_BINARY_WIDTH,
     DEFAULT_HEX_WIDTH,

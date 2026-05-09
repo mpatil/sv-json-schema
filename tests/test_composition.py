@@ -6,7 +6,7 @@ import pytest
 from json_ref_dict import RefDict, materialize
 from statham.titles import title_labeller
 
-from serializers.composition import apply_allof_merging
+from sv_json_schema.composition import apply_allof_merging
 
 
 class TestApplyAllOfMerging:

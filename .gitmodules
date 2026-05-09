@@ -1,6 +1,3 @@
-[submodule "statham-schema"]
-	path = statham-schema
-	url = https://github.com/mpatil/statham-schema
 [submodule "sv-embed-json"]
 	path = sv-embed-json
 	url = https://mpatil@github.com/mpatil/sv-embed-json.git

@@ -6,7 +6,7 @@ import pytest
 from json_ref_dict import RefDict, materialize
 from statham.titles import title_labeller
 
-from serializers.oneof import (
+from sv_json_schema.oneof import (
     OneOfBranch,
     OneOfError,
     OneOfSpec,

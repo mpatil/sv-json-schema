@@ -1,9 +1,10 @@
 """Shared pytest configuration.
 
-Puts the repo root and the bundled statham-schema submodule on sys.path so
-test modules can `from serializers...` and `from statham...` directly without
-relying on the user installing the project. Also exposes path fixtures and a
-simulator-detection fixture used by the end-to-end tests.
+Puts `src/` on sys.path so `from sv_json_schema.* import …` works whether
+or not the project has been editable-installed. statham-schema is a real
+PyPI dependency now, so no path manipulation is needed for it. Exposes
+path fixtures and a simulator-detection fixture used by the end-to-end
+tests.
 """
 
 from __future__ import annotations
@@ -19,11 +20,9 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 FIXTURES_DIR = Path(__file__).resolve().parent / "fixtures"
 EXPECTED_DIR = Path(__file__).resolve().parent / "expected"
 
-# Make the project + statham-schema importable for any test module.
-for path in (REPO_ROOT, REPO_ROOT / "statham-schema"):
-    p = str(path)
-    if p not in sys.path:
-        sys.path.insert(0, p)
+_SRC = REPO_ROOT / "src"
+if str(_SRC) not in sys.path:
+    sys.path.insert(0, str(_SRC))
 
 
 def pytest_addoption(parser: pytest.Parser) -> None:

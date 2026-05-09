@@ -1,5 +1,8 @@
 __pycache__
 .pytest_cache
+build/
+dist/
+*.egg-info/
 config_m.sv
 testbench.sv
 qrun.out

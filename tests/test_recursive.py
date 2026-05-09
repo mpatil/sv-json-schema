@@ -5,7 +5,7 @@ from __future__ import annotations
 from json_ref_dict import RefDict, materialize
 from statham.titles import title_labeller
 
-from serializers.recursive import (
+from sv_json_schema.recursive import (
     break_recursive_cycles,
     collect_recursive_refs,
     is_stub_class_name,

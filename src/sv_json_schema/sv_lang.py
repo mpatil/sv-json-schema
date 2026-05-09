@@ -21,10 +21,10 @@ from statham.schema.elements import (
 from statham.schema.elements.meta import ObjectMeta
 from statham.serializers.orderer import orderer
 
-from serializers.bitvec import BitVec, RADIX_BINARY, RADIX_HEX, WidthMap
-from serializers.intformat import IntFormatMap
-from serializers.oneof import OneOfMap, OneOfPropMap
-from serializers.recursive import RecursiveRefMap, is_stub_class_name
+from sv_json_schema.bitvec import BitVec, RADIX_BINARY, RADIX_HEX, WidthMap
+from sv_json_schema.intformat import IntFormatMap
+from sv_json_schema.oneof import OneOfMap, OneOfPropMap
+from sv_json_schema.recursive import RecursiveRefMap, is_stub_class_name
 
 
 T = TypeVar("T")

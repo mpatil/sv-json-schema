@@ -152,7 +152,7 @@ def _build_workspace(repo_root, fixtures_dir, schema_name, tmp_path, data_dir):
         tb_out=tmp_path / "testbench.sv",
         data_dir=data_dir,
     )
-    for name in ("sv-embed-json", "serializers", "sv_tb.f"):
+    for name in ("sv-embed-json", "src", "sv_tb.f"):
         (tmp_path / name).symlink_to(repo_root / name)
     return tmp_path
 

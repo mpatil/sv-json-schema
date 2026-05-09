@@ -499,11 +499,12 @@ The generated SV depends on three pieces of [sv-embed-json](https://github.com/m
 * The non-UVM `Val_` core stays UVM-free; `json_macros.svh` is the
   optional UVM layer.
 
-`sv_tb.f` puts both
-`+incdir+sv-embed-json/src/json` and `+incdir+sv-embed-json/src/json/uvm`
-on the include path; `serializers/sv_tb_pkg.sv` does
-`\`include "json_macros.svh"` so the macros are in scope when
-`config_m.sv` is compiled.
+Plus one piece that ships inside the wheel under
+`sv_json_schema/data/`: `sv_tb_pkg.sv`. It imports the relevant
+sv-embed-json names, includes the UVM macros, and pulls in the generated
+`config_m.sv`. The simulator finds it via `+incdir+`; pass the path
+returned by `sv-json-schema --print-incdir` (or use
+`+incdir+src/sv_json_schema/data` directly when running from a clone).
 
 ---
 

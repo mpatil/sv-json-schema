@@ -12,10 +12,10 @@ from json_ref_dict import RefDict, materialize
 from statham.schema.parser import parse
 from statham.titles import title_labeller
 
-from serializers.bitvec import collect_bitvec_widths
-from serializers.intformat import collect_int_formats
-from serializers.oneof import collect_oneof_props, collect_oneofs
-from serializers.sv_lang import serialize_sv
+from sv_json_schema.bitvec import collect_bitvec_widths
+from sv_json_schema.intformat import collect_int_formats
+from sv_json_schema.oneof import collect_oneof_props, collect_oneofs
+from sv_json_schema.sv_lang import serialize_sv
 
 
 @pytest.fixture(scope="module")
@@ -269,7 +269,7 @@ def test_invalid_string_enum_value_raises(fixtures_dir, tmp_path):
     """An enum value that isn't a valid SV identifier should fail at codegen."""
     import json as _json
 
-    from serializers.sv_lang import PlainEnumError
+    from sv_json_schema.sv_lang import PlainEnumError
 
     bad = tmp_path / "bad_enum.json"
     bad.write_text(

@@ -3,7 +3,7 @@ sv-embed-json/src/json/json_pkg.sv
 +incdir+sv-embed-json/src
 +incdir+sv-embed-json/src/json
 +incdir+sv-embed-json/src/json/uvm
-+incdir+serializers
++incdir+src/sv_json_schema/data
 +define+JSON_PKG
-serializers/sv_tb_pkg.sv
+src/sv_json_schema/data/sv_tb_pkg.sv
 +incdir+./
